@@ -8,3 +8,5 @@ The objective of this project is to help me get better acquainted with the compo
 - https://github.com/amdegroot/ssd.pytorch
 - https://github.com/kuangliu/pytorch-ssd/blob/master/encoder.py
 
+For training, I used the COCO Dataset 2017 version: https://cocodataset.org/#download
+
