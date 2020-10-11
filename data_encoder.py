@@ -21,7 +21,7 @@ class DataEncoder:
         default_boxes = []
 
         # The size of the k-th square feature map
-        fk = figure_size / np.array(feature_map_sizes)
+        fk = figure_size / np.array(steps)
 
         for idx, size in enumerate(feature_map_sizes):
             
@@ -48,6 +48,25 @@ class DataEncoder:
                     cx = (i + 0.5) / fk[idx]
                     cy = (j + 0.5) / fk[idx]
 
-                    default_boxes.append([cx, cy, cx + width, cy + height])
+                    default_boxes.append([cx, cy, width, height])
 
-        return torch.tensor(default_boxes, dtype=torch.float)
+        dboxes = torch.tensor(default_boxes, dtype=torch.float)
+
+        # Convert Default Boxes to x_min, y_min, x_max, y_max
+        dboxes_ltrb = dboxes.clone()
+        dboxes_ltrb[:, 0] = dboxes[:, 0] - 0.5 * dboxes[:, 2]
+        dboxes_ltrb[:, 1] = dboxes[:, 1] - 0.5 * dboxes[:, 3]
+        dboxes_ltrb[:, 2] = dboxes[:, 0] + 0.5 * dboxes[:, 2]
+        dboxes_ltrb[:, 3] = dboxes[:, 1] + 0.5 * dboxes[:, 3]
+
+        return dboxes_ltrb
+
+    def encode(self, bounding_boxes):
+
+        encoded_boxes = []
+
+        default_boxes = self.default_boxes
+        num_default_boxes = default_boxes.size(0)
+
+
+        return encoded_boxes
