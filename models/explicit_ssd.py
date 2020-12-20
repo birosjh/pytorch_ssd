@@ -1,3 +1,11 @@
+"""
+explicit_ssd.py
+---------------------------------------------
+
+Contains a model with the layers explicitly written out.
+
+"""
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
