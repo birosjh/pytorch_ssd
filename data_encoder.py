@@ -1,4 +1,10 @@
+"""
+data_encoder.py
+---------------------------------------------
 
+Contains functions for encoding bounding boxes in terms of default boxes.
+
+"""
 from math import sqrt
 from itertools import product
 import numpy as np
