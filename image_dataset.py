@@ -25,17 +25,21 @@ class ImageDataset(Dataset):
             "width": self.width
         })
 
+        # Load Annotations Json
         with open(data_config["annotations"]) as file:
             annotations_file = file.read()
 
         annotation_json = json.loads(annotations_file)
 
+        # Prepare images with annotations
         self.image_annotations = self.prep_images_and_annotations(
             annotation_json
         )
 
+        # Create list of images to draw from using idx
         self.images_list = list(self.image_annotations.keys())
 
+        # Create list of categories by ID for reference
         self.categories_by_id = self.prep_categories(
             annotation_json["categories"]
         )
@@ -45,13 +49,15 @@ class ImageDataset(Dataset):
 
     def __getitem__(self, idx):
 
+        # Load image
         image_file = self.images_list[idx]
-
         path_to_file = os.path.join(self.image_directory, image_file)
         image = cv2.imread(path_to_file)
 
+        # Fetch annotations for that image (they are already in bbs format)
         labels = self.image_annotations[image_file]
 
+        # Perform transformations on the data
         if self.transform:
             labels = BoundingBoxesOnImage(labels, shape=(self.height, self.width))
 
@@ -59,10 +65,10 @@ class ImageDataset(Dataset):
                 image=image, 
                 bounding_boxes=labels
             )
-        
-        labels = np.array([np.append(box.coords.flatten(), box.label) for box in labels.bounding_boxes])
 
-        print(labels.shape)
+            labels = labels.bounding_boxes
+        
+        labels = np.array([np.append(box.coords.flatten(), box.label) for box in labels])
 
         return (image, labels)
 
@@ -107,13 +113,6 @@ class ImageDataset(Dataset):
 
         return image_annotations
 
-    def pair_images_with_annotations(self, images, annotations):
-
-        image_ids_with_annotations = {}
-
-        
-
-        return image_ids_with_annotations
 
     def prep_categories(self, categories_json):
 
