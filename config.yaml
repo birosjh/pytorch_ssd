@@ -9,3 +9,5 @@ simple_model_configuration:
 data_configuration:
     annotations: "/data/annotations.json"
     image_directory: "/data/images"
+    height: 256
+    width: 512

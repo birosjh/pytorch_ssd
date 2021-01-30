@@ -2,13 +2,24 @@ import os
 import cv2
 import json
 import torch
+
+import numpy as np
+import imgaug.augmenters as iaa
+
 from torch.utils.data import Dataset
 
 class ImageDataset(Dataset):
 
-    def __init__(self, data_config):
+    def __init__(self, data_config, transform):
 
         self.image_directory = data_config["image_directory"]
+
+        self.transform = transform
+
+        self.resize_transformation = iaa.Resize({
+            "height": data_config["height"],
+            "width": data_config["width"]
+        })
 
         with open(data_config["annotations"]) as file:
             annotations_file = file.read()
@@ -36,6 +47,9 @@ class ImageDataset(Dataset):
         image = cv2.imread(path_to_file)
 
         labels = self.image_annotations[image_file]
+
+        if self.transform:
+            image, labels = self.resize_transformation(images=image, labels=labels)
 
         return (image, labels)
 
