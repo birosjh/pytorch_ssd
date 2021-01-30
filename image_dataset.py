@@ -70,7 +70,7 @@ class ImageDataset(Dataset):
                 )
 
             else:
-                image_annotations[image_name] += [annotation_with_category]
+                image_annotations[image_name] = [annotation_with_category]
 
         return image_annotations
 
