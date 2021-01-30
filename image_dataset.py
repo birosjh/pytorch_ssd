@@ -7,6 +7,7 @@ import numpy as np
 import imgaug.augmenters as iaa
 
 from torch.utils.data import Dataset
+from imgaug.augmentables.bbs import BoundingBox, BoundingBoxesOnImage
 
 class ImageDataset(Dataset):
 
@@ -16,9 +17,12 @@ class ImageDataset(Dataset):
 
         self.transform = transform
 
+        self.height = data_config["height"]
+        self.width = data_config["width"]
+
         self.resize_transformation = iaa.Resize({
-            "height": data_config["height"],
-            "width": data_config["width"]
+            "height": self.height,
+            "width": self.width
         })
 
         with open(data_config["annotations"]) as file:
@@ -49,7 +53,16 @@ class ImageDataset(Dataset):
         labels = self.image_annotations[image_file]
 
         if self.transform:
-            image, labels = self.resize_transformation(images=image, labels=labels)
+            labels = BoundingBoxesOnImage(labels, shape=(self.height, self.width))
+
+            image, labels = self.resize_transformation(
+                image=image, 
+                bounding_boxes=labels
+            )
+        
+        labels = np.array([np.append(box.coords.flatten(), box.label) for box in labels.bounding_boxes])
+
+        print(labels.shape)
 
         return (image, labels)
 
@@ -74,17 +87,23 @@ class ImageDataset(Dataset):
                 annotation['image_id']
             ]
 
-            # Append category id to the end of the annotation
-            annotation_with_category = annotation['bbox'] + [annotation['category_id']]
+            # Create bounding box
+            bounding_box = BoundingBox(
+                x1=annotation['bbox'][0],
+                y1=annotation['bbox'][1],
+                x2=annotation['bbox'][0] + annotation['bbox'][2],
+                y2=annotation['bbox'][1] + annotation['bbox'][3],
+                label=annotation['category_id']
+            )
 
             if image_name in image_annotations.keys():
 
                 image_annotations[image_name].append(
-                    annotation_with_category
+                    bounding_box
                 )
 
             else:
-                image_annotations[image_name] = [annotation_with_category]
+                image_annotations[image_name] = [bounding_box]
 
         return image_annotations
 
