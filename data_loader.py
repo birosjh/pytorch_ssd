@@ -1,3 +1,4 @@
+import cv2
 import json
 import torch
 import torch.utils.data as data
@@ -11,44 +12,71 @@ class DataLoader(data.dataset):
         with open(data_config.annotations) as file:
             annotations_file = file.read()
 
-        raw_annotations = json.loads(annotations_file)
+        annotation_json = json.loads(annotations_file)
 
-        self.images_with_ids = self.prep_images(
-            raw_annotations["images"]
+        self.image_annotations = self.prep_images_and_annotations(
+            annotation_json
         )
 
-        self.image_ids_with_annotations = self.prep_images(
-            raw_annotations["annotations"]
-        )
+        self.images_list = list(self.image_annotations.keys())
 
         self.categories_by_id = self.prep_categories(
-            raw_annotations["categories"]
+            annotation_json["categories"]
         )
 
+    def __len__(self):
+        return len(self.images_list)
 
-    def prep_images(self, images_json):
+    def __getitem__(self, idx):
 
-        images_with_ids = {}
+        image_file = self.images_list[idx]
 
-        for image in images_json:
-            images_with_ids[image["file_name"]] = image["id"]
+        image = cv2.imread(image_file)
 
-        return images_with_ids
+        labels = self.image_annotations[image_file]
 
-    def prep_annotations(self, annotations_json):
+        return (image, labels)
+
+    def prep_images_and_annotations(self, annotation_json):
+
+        # Split annotation_json
+        images = annotation_json["images"]
+        annotations = annotation_json["annotations"]
+
+        # List images by image ID
+        images_by_ids = [] 
+
+        for image in images:
+            images_by_ids[image["id"]] = image["file_name"]
+
+        # Create a list of image_annotations
+        image_annotations = {}
+
+        for annotation in annotations:
+
+            image_name = images_by_ids[
+                annotation['image_id']
+            ]
+
+            # Append category id to the end of the annotation
+            annotation_with_category = annotation['bbox'] + [annotation['category_id']]
+
+            if image_name in image_annotations.keys():
+
+                image_annotations[image_name].append(
+                    annotation_with_category
+                )
+
+            else:
+                image_annotations[image_name] += [annotation_with_category]
+
+        return image_annotations
+
+    def pair_images_with_annotations(self, images, annotations):
 
         image_ids_with_annotations = {}
 
-        for annotation in annotations_json:
-            key = annotation['image_id']
-            value = annotation['bbox'] + [annotation['category_id']]
-
-            if key in image_ids_with_annotations.keys():
-
-                image_ids_with_annotations[key].append(value)
-
-            else:
-                image_ids_with_annotations[key] = [value]
+        
 
         return image_ids_with_annotations
 
