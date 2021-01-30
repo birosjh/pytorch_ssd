@@ -8,17 +8,21 @@ class TestDataloader(unittest.TestCase):
 
     def setUp(self):
         self.data_config = {
-            "annotations": "tests/test_annotations.json"
+            "annotations": "tests/test_annotations.json",
+            "image_directory": "tests/test_data",
+            "height": 256,
+            "width": 512
         }
 
         self.batch_size = 10
 
         self.dataset = ImageDataset(
-            data_config=self.data_config
+            data_config=self.data_config,
+            transform=True
         )
 
 
-    def test_the_number_of_items_in_the_batch(self):
+    def test_the_shape_a_the_batch(self):
 
         dataloader = DataLoader(
             self.dataset,
@@ -26,9 +30,10 @@ class TestDataloader(unittest.TestCase):
             num_workers=0
         )
 
-        images, labels = next(dataloader)
+        images, labels = next(iter(dataloader))
 
         print(images.shape)
+        print(labels.shape)
 
 
 
