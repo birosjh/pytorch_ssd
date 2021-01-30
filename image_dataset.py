@@ -1,13 +1,13 @@
 import cv2
 import json
 import torch
-import torch.utils.data as data
+from torch.utils.data import Dataset
 
-class ImageDataset(data.dataset):
+class ImageDataset(Dataset):
 
     def __init__(self, data_config):
 
-        with open(data_config.annotations) as file:
+        with open(data_config["annotations"]) as file:
             annotations_file = file.read()
 
         annotation_json = json.loads(annotations_file)
