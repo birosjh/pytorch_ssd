@@ -3,7 +3,7 @@ import json
 import torch
 import torch.utils.data as data
 
-class DataLoader(data.dataset):
+class ImageDataset(data.dataset):
 
     def __init__(self, data_config, batch_size):
 
