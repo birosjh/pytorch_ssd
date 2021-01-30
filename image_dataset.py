@@ -9,16 +9,22 @@ import imgaug.augmenters as iaa
 from torch.utils.data import Dataset
 from imgaug.augmentables.bbs import BoundingBox, BoundingBoxesOnImage
 
+from data_encoder import DataEncoder
+
 class ImageDataset(Dataset):
 
-    def __init__(self, data_config, transform):
+    def __init__(self, data_config, transform=True, train=True):
+
+        self.train = train
 
         self.image_directory = data_config["image_directory"]
 
         self.transform = transform
 
-        self.height = data_config["height"]
-        self.width = data_config["width"]
+        self.height = data_config["figure_size"]
+        self.width = data_config["figure_size"]
+
+        self.data_encoder = DataEncoder(data_config)
 
         self.resize_transformation = iaa.Resize({
             "height": self.height,
@@ -69,6 +75,9 @@ class ImageDataset(Dataset):
             labels = labels.bounding_boxes
         
         labels = np.array([np.append(box.coords.flatten(), box.label) for box in labels])
+
+        if self.train:
+            labels = self.data_encoder.encode(labels)
 
         return (image, labels)
 
