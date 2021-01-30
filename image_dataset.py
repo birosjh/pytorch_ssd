@@ -5,9 +5,7 @@ import torch.utils.data as data
 
 class ImageDataset(data.dataset):
 
-    def __init__(self, data_config, batch_size):
-
-        self.batch_size = batch_size
+    def __init__(self, data_config):
 
         with open(data_config.annotations) as file:
             annotations_file = file.read()
