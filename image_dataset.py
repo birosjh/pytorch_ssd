@@ -1,3 +1,4 @@
+import os
 import cv2
 import json
 import torch
@@ -6,6 +7,8 @@ from torch.utils.data import Dataset
 class ImageDataset(Dataset):
 
     def __init__(self, data_config):
+
+        self.image_directory = data_config["image_directory"]
 
         with open(data_config["annotations"]) as file:
             annotations_file = file.read()
@@ -29,7 +32,8 @@ class ImageDataset(Dataset):
 
         image_file = self.images_list[idx]
 
-        image = cv2.imread(image_file)
+        path_to_file = os.path.join(self.image_directory, image_file)
+        image = cv2.imread(path_to_file)
 
         labels = self.image_annotations[image_file]
 
