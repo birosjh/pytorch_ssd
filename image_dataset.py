@@ -42,7 +42,7 @@ class ImageDataset(Dataset):
         annotations = annotation_json["annotations"]
 
         # List images by image ID
-        images_by_ids = [] 
+        images_by_ids = {} 
 
         for image in images:
             images_by_ids[image["id"]] = image["file_name"]
