@@ -1,4 +1,4 @@
 __pycache__/
 data/
-tests/test_data/JPEGImages
-tests/test_data/Annotations
+tests/test_data/images
+tests/test_data/annotations
