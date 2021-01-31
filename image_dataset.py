@@ -2,6 +2,7 @@ import os
 import cv2
 import json
 import torch
+import xmltodict
 
 import numpy as np
 import pandas as pd
@@ -16,10 +17,14 @@ class ImageDataset(Dataset):
 
     def __init__(self, data_config, transform=True, mode="train"):
 
+        # Set the mode (train/val)
+        self.mode = mode
+
         # Read in necessary configs
         file_data_path = data_config[mode]
         self.image_directory = data_config["image_directory"]
-        self.annotations_directory = data_config["annotations_directory"]
+        self.annotation_directory = data_config["annotation_directory"]
+        self.classes = data_config['classes']
 
         self.file_list = self.create_file_list(file_data_path)
 
@@ -37,17 +42,18 @@ class ImageDataset(Dataset):
 
 
     def __len__(self):
-        return len(self.images_list)
+        return len(self.file_list)
 
     def __getitem__(self, idx):
 
-        # Load image
+        # Select filename from list
         filename = self.file_list[idx]
-        path_to_file = os.path.join(self.image_directory, filename + ".jpg")
-        image = cv2.imread(path_to_file)
+        
+        # Load image
+        image = self.load_image(filename)
 
-        # Fetch annotations for that image (they are already in bbs format)
-        labels = load_labels_from_annotation(filename)
+        # Load annotations for image
+        labels = self.load_labels_from_annotation(filename)
 
         # Perform transformations on the data
         if self.transform:
@@ -62,7 +68,7 @@ class ImageDataset(Dataset):
         
         labels = np.array([np.append(box.coords.flatten(), box.label) for box in labels])
 
-        if self.train:
+        if self.mode is "train":
             labels = self.data_encoder.encode(labels)
 
         return (image, labels)
@@ -77,20 +83,37 @@ class ImageDataset(Dataset):
 
         return file_list
 
-    def load_labels_from_annotation(self, filename: str): -> list:
+    def load_image(self, filename: str) -> np.array:
+
+        path_to_file = os.path.join(self.image_directory, filename + ".jpg")
+        image = cv2.imread(path_to_file)
+
+        return image
+
+    def load_labels_from_annotation(self, filename: str) -> list:
+
+        path_to_file = os.path.join(self.annotation_directory, filename + ".xml")
+
+        with open(path_to_file) as fd:
+            annotation = xmltodict.parse(fd.read())
+
+        objects = annotation["annotation"]['object']
+
+        if type(objects) is not list:
+            objects = [objects]
 
         labels = []
 
-        annotations = []
+        for obj in objects:
 
-        for annotation in annotations:
+            box = obj['bndbox']
 
             labels.append(BoundingBox(
-                x1=annotation["x1"],
-                y1=annotation["y1"],
-                x2=annotation["x2"],
-                y2=annotation["y2"],
-                label=x1=annotation["label"]
+                x1=box["xmin"],
+                y1=box["ymin"],
+                x2=box["xmax"],
+                y2=box["ymax"],
+                label=self.classes.index(obj["name"])
             ))
 
 
