@@ -12,4 +12,4 @@
 - https://github.com/amdegroot/ssd.pytorch
 - https://github.com/kuangliu/pytorch-ssd/blob/master/encoder.py
 
-学習のため、Coco Datsetの2017年バージョンを利用しています: https://cocodataset.org/#download
+学習のため、VOC Datasetを利用しています: http://host.robots.ox.ac.uk/pascal/VOC/

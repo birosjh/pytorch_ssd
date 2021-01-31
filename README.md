@@ -12,4 +12,4 @@ My implementation was heavily influenced by these implementations:
 - https://github.com/amdegroot/ssd.pytorch
 - https://github.com/kuangliu/pytorch-ssd/blob/master/encoder.py
 
-For training, I used the COCO Dataset 2017 version: https://cocodataset.org/#download
+For training, I used the VOC Dataset 2017 version: http://host.robots.ox.ac.uk/pascal/VOC/
