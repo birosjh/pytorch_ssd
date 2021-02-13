@@ -1,3 +1,4 @@
+import yaml
 import unittest
 
 from image_dataset import ImageDataset
@@ -7,18 +8,18 @@ from torch.utils.data import DataLoader
 class TestDataloader(unittest.TestCase):
 
     def setUp(self):
-        self.data_config = {
-            "annotations": "tests/test_annotations.json",
-            "image_directory": "tests/test_data",
-            "height": 256,
-            "width": 512
-        }
+
+        with open("tests/test_config.yaml") as f:
+            config = yaml.safe_load(f)
+
+        self.data_config = config["data_configuration"]
 
         self.batch_size = 10
 
         self.dataset = ImageDataset(
             data_config=self.data_config,
-            transform=True
+            transform=True,
+            mode="val"
         )
 
 
