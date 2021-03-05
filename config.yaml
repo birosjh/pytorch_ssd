@@ -1,5 +1,11 @@
-simple_model_configuration:
+model_configuration:
     model: "simple"
+
+training_configuration:
+    learning_rate: 0.001
+    batch_size: 32
+    epochs: 50
+    num_workers: 0
 
 data_configuration:
     train: "/data/train.txt"
