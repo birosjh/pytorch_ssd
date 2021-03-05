@@ -39,6 +39,7 @@ class ImageDataset(Dataset):
         })
 
         self.data_encoder = DataEncoder(data_config)
+        self.default_boxes = self.data_encoder.default_boxes
 
 
     def __len__(self):
@@ -66,7 +67,7 @@ class ImageDataset(Dataset):
 
             labels = labels.bounding_boxes
         
-        labels = np.array([np.append(box.coords.flatten(), box.label) for box in labels])
+        labels = torch.Tensor([np.append(box.coords.flatten(), box.label) for box in labels])
 
         if self.mode is "train":
             labels = self.data_encoder.encode(labels)
