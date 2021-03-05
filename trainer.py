@@ -33,18 +33,17 @@ class Trainer:
 
     def train(self):
 
-        size = len(self.dataloader.dataset)
+        for epoch in range(self.epochs):
+            print('Epoch {}/{}'.format(epoch, self.epochs - 1))
+            print('-' * 10)
 
-        for batch, (X, y) in enumerate(self.dataloader):
-            # Compute prediction and loss
-            pred = self.model(X)
-            loss = self.loss_function(pred, y)
+            for X, y in self.dataloader:
+                # Compute prediction and loss
+                pred = self.model(X)
+                loss = self.loss_function(pred, y)
 
-            # Backpropagation
-            self.optimizer.zero_grad()
-            loss.backward()
-            self.optimizer.step()
+                # Backpropagation
+                self.optimizer.zero_grad()
+                loss.backward()
+                self.optimizer.step()
 
-            if batch % 100 == 0:
-                loss, current = loss.item(), batch * len(X)
-                print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
