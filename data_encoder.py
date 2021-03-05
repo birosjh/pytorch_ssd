@@ -56,7 +56,7 @@ class DataEncoder:
 
                     default_boxes.append([cx, cy, width, height])
 
-        dboxes = torch.tensor(default_boxes, dtype=torch.float)
+        dboxes = torch.tensor(default_boxes, dtype=torch.float32)
 
         # Convert Default Boxes to x_min, y_min, x_max, y_max
         dboxes_ltrb = dboxes.clone()
@@ -67,22 +67,42 @@ class DataEncoder:
 
         return dboxes_ltrb
 
-    def encode(self, bounding_boxes):
+    def encode(self, boxes_and_labels, criteria=0.5):
 
-        encoded_boxes = []
+        bounding_boxes = boxes_and_labels[:, 0:4]
+        labels_in = boxes_and_labels[:, 4]
 
-        default_boxes = self.default_boxes
-        num_default_boxes = default_boxes.size(0)
+        num_default_boxes = self.default_boxes.size(0)
 
-        ious = self.calculate_iou(bounding_boxes, default_boxes)
+        # Returns a matrix of ious for each bbox and each dbox
+        ious = self.calculate_iou(bounding_boxes, self.default_boxes)
 
-        iou, max_idx = ious.max(0)  # [1,8732]
-        max_idx.squeeze_(0)        # [8732,]
-        iou.squeeze_(0)            # [8732,]
+        # Get the values and indices of the best bbox ious for dboxes
+        best_dbox_ious, best_dbox_idx = ious.max(0)
+
+        # Get the values and inices of the best dbox ious for bboxes
+        best_bbox_ious, best_bbox_idx = ious.max(1)
+
+        # Set locations where both dbox and bbox ious were the best to 2.0
+        best_dbox_ious.index_fill_(0, best_bbox_idx, 2.0)
 
 
+        idx = torch.arange(0, best_bbox_idx.size(0), dtype=torch.int64)
+        best_dbox_idx[best_bbox_idx[idx]] = idx
 
-        return encoded_boxes
+        # filter IoU > 0.5
+        passes_criteria = best_dbox_ious > criteria
+
+        labels_out = torch.zeros(num_default_boxes, dtype=torch.float32)
+        labels_out[passes_criteria] = labels_in[best_dbox_idx[passes_criteria]]
+
+        encoded_boxes = self.default_boxes.clone()
+        encoded_boxes[passes_criteria, :] = bounding_boxes[best_dbox_idx[passes_criteria], :]
+
+        # Rejoin the encoded boxes and labels
+        encoded_boxes_and_labels = torch.cat((encoded_boxes, labels_out.unsqueeze(1)), 1)
+
+        return encoded_boxes_and_labels
 
     def calculate_iou(self, box1, box2):
 

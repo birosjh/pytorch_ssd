@@ -19,7 +19,6 @@ class TestDataloader(unittest.TestCase):
         self.dataset = ImageDataset(
             data_config=self.data_config,
             transform=True,
-            mode="val"
         )
 
 
@@ -35,6 +34,7 @@ class TestDataloader(unittest.TestCase):
 
         print(images.shape)
         print(labels.shape)
+
 
 
 
