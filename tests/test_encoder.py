@@ -83,6 +83,17 @@ class TestEncoder(unittest.TestCase):
             [self.total_num_boxes, 5]
         )
 
+    def test_encoder_output(self):
+
+        temp_tensors = torch.Tensor([
+            [30.6000,  64.0000,  73.2000, 212.8000,  14.0000],
+            [220.2000,  73.6000, 276.6000, 252.0000,  14.0000]
+        ])
+
+        ious = self.data_encoder.calculate_iou(
+            temp_tensors[:, 0:4], self.data_encoder.default_boxes)
+
+        print(ious)
 
 if __name__ == '__main__':
     unittest.main()
