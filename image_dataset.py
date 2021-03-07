@@ -15,7 +15,7 @@ from data_encoder import DataEncoder
 
 class ImageDataset(Dataset):
 
-    def __init__(self, data_config, transform=True, mode="train"):
+    def __init__(self, data_config, transform=False, mode="train"):
 
         # Set the mode (train/val)
         self.mode = mode
@@ -24,11 +24,13 @@ class ImageDataset(Dataset):
         file_data_path = data_config[mode]
         self.image_directory = data_config["image_directory"]
         self.annotation_directory = data_config["annotation_directory"]
-        self.classes = data_config['classes']
+        self.classes = tuple(data_config['classes'])
 
         self.file_list = self.create_file_list(file_data_path)
 
         self.transform = transform
+
+        self.transformations = iaa.Noop()
 
         self.height = data_config["figure_size"]
         self.width = data_config["figure_size"]
@@ -56,16 +58,23 @@ class ImageDataset(Dataset):
         # Load annotations for image
         labels = self.load_labels_from_annotation(filename)
 
+        labels = BoundingBoxesOnImage(labels, shape=image.shape)
+
         # Perform transformations on the data
         if self.transform:
-            labels = BoundingBoxesOnImage(labels, shape=(self.height, self.width))
-
-            image, labels = self.resize_transformation(
+            
+            image, labels = self.transformations(
                 image=image, 
                 bounding_boxes=labels
             )
 
-            labels = labels.bounding_boxes
+        # Resize data regardless of train or test
+        image, labels = self.resize_transformation(
+            image=image,
+            bounding_boxes=labels
+        )
+
+        labels = labels.bounding_boxes
         
         labels = torch.Tensor([np.append(box.coords.flatten(), box.label) for box in labels])
 
