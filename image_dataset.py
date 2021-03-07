@@ -89,7 +89,7 @@ class ImageDataset(Dataset):
 
         df['filename'] = df['filename'].str.replace(r"\s\s\d", "")
 
-        file_list = df['filename'].tolist()
+        file_list = df['filename'].unique().tolist()
 
         return file_list
 
@@ -125,7 +125,6 @@ class ImageDataset(Dataset):
                 y2=box["ymax"],
                 label=self.classes.index(obj["name"])
             ))
-
 
         return labels
 
