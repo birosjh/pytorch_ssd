@@ -15,10 +15,12 @@ from data_encoder import DataEncoder
 
 class ImageDataset(Dataset):
 
-    def __init__(self, data_config, transform=False, mode="train"):
+    def __init__(self, data_config, transform=False, mode="train", visualize=False):
 
         # Set the mode (train/val)
         self.mode = mode
+
+        self.visualize = visualize
 
         # Read in necessary configs
         file_data_path = data_config[mode]
@@ -78,8 +80,17 @@ class ImageDataset(Dataset):
         
         labels = torch.Tensor([np.append(box.coords.flatten(), box.label) for box in labels])
 
+        image = torch.Tensor(image)
+
         if self.mode is "train":
             labels = self.data_encoder.encode(labels)
+
+        if self.visualize:
+
+            return (image, labels)
+
+        # This seems bad, but I will revist it later when I check for bottlenecks
+        image = image.permute(2, 0, 1)
 
         return (image, labels)
 
