@@ -9,7 +9,7 @@ model_configuration:
 
 training_configuration:
     learning_rate: 0.001
-    batch_size: 16
+    batch_size: 4
     epochs: 50
     num_workers: 0
 
@@ -24,4 +24,4 @@ data_configuration:
     scales: [30, 60, 111, 162, 213, 264, 315]
     aspect_ratios: [[2], [2,3], [2,3], [2,3], [2], [2]]
     feature_maps: [38, 19, 10, 5, 3, 1]
-    classes: ('aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus', 'car', 'cat', 'chair', 'cow', 'diningtable', 'dog', 'horse', 'motorbike', 'person', 'pottedplant', 'sheep', 'sofa', 'train', 'tvmonitor')
+    classes: ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus', 'car', 'cat', 'chair', 'cow', 'diningtable', 'dog', 'horse', 'motorbike', 'person', 'pottedplant', 'sheep', 'sofa', 'train', 'tvmonitor']
