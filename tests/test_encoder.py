@@ -16,16 +16,20 @@ class TestEncoder(unittest.TestCase):
 
         self.data_encoder = DataEncoder(self.data_config)
 
-    def test_default_box_shape(self):
-
-        total_num_boxes = 0
+        self.total_num_boxes = 0
         for idx, feature_map in enumerate(self.data_config['feature_maps']):
             num_aspect_ratios = 2 + \
                 len(self.data_config['aspect_ratios'][idx]) * 2
-            total_num_boxes += (feature_map * feature_map) * num_aspect_ratios
+            self.total_num_boxes += (feature_map * feature_map) * num_aspect_ratios
 
-        self.assertEqual(total_num_boxes, len(self.data_encoder.default_boxes))
+    def test_default_box_shape(self):
+
         
+        self.assertEqual(
+            self.total_num_boxes, 
+            len(self.data_encoder.default_boxes)
+        )
+
     def test_single_iou_output_is_correct(self):
 
         box1 = torch.tensor([[200.0, 300.0, 350.0, 400.0]])
@@ -63,6 +67,21 @@ class TestEncoder(unittest.TestCase):
         )
 
         self.assertTrue(equivalence_check.numpy())
+
+
+    def test_shape_of_encoder_output(self):
+
+        temp_tensors = torch.Tensor([
+            [30.6000,  64.0000,  73.2000, 212.8000,  14.0000],
+            [220.2000,  73.6000, 276.6000, 252.0000,  14.0000]
+        ])
+
+        result = self.data_encoder.encode(temp_tensors)
+
+        self.assertListEqual(
+            list(result.shape), 
+            [self.total_num_boxes, 5]
+        )
 
 
 if __name__ == '__main__':
