@@ -38,7 +38,9 @@ def main():
         transform=True,
     )
 
-    model = SSD().to(device)
+    num_classes = len(data_config['classes'])
+
+    model = SSD(num_classes).to(device)
 
     trainer = Trainer(
         model, 
