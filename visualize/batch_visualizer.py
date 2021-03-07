@@ -74,15 +74,21 @@ def main():
     )
 
     images, labels = next(iter(dataloader))
-
     bounding_boxes = convert_to_bounding_boxes(labels)
 
-    bbs = BoundingBoxesOnImage(bounding_boxes[0], shape=images[0].shape)
+    bbs_applied_images = []
 
-    image_after = bbs.draw_on_image(images[0], size=2, color=[0, 0, 255])
+    for image, bbs in zip(images, bounding_boxes):
+
+        bbs = BoundingBoxesOnImage(bbs, shape=image.shape)
+        bbs_applied_images.append(
+            bbs.draw_on_image(image, size=2, color=[0, 0, 255])
+        )
+
+    batch_image = cv2.vconcat(bbs_applied_images)
 
     file_name = "image.jpg"
-    cv2.imwrite(file_name, image_after)
+    cv2.imwrite(file_name, batch_image)
 
 
 if __name__ == "__main__":
