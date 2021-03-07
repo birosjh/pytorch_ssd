@@ -55,8 +55,6 @@ def main():
     training_config = config["training_configuration"]
     data_config = config["data_configuration"]
 
-    print(config)
-
     mode = "train"
 
     if use_val:
@@ -76,10 +74,6 @@ def main():
     )
 
     images, labels = next(iter(dataloader))
-
-
-    print(labels[0])
-
 
     bounding_boxes = convert_to_bounding_boxes(labels)
 
