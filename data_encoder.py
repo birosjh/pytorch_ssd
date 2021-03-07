@@ -65,7 +65,7 @@ class DataEncoder:
         dboxes_ltrb[:, 2] = dboxes[:, 0] + 0.5 * dboxes[:, 2]
         dboxes_ltrb[:, 3] = dboxes[:, 1] + 0.5 * dboxes[:, 3]
 
-        return dboxes_ltrb
+        return dboxes_ltrb * figure_size
 
     def encode(self, boxes_and_labels, criteria=0.5):
 
