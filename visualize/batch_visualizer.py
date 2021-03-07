@@ -70,7 +70,8 @@ def main():
     dataloader = DataLoader(
         dataset,
         batch_size=training_config["batch_size"],
-        num_workers=0
+        num_workers=0,
+        shuffle=True
     )
 
     images, labels = next(iter(dataloader))
