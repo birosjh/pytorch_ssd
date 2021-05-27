@@ -10,18 +10,19 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from layers.downsample_block import DownsampleBlock
+
 
 class SSD(nn.Module):
 
-    def __init__(self, aspect_ratio_setting_per_feature_map: list, num_classes: int):
+    def __init__(self, backbone: nn.Module, aspect_ratio_setting_per_feature_map: list, num_classes: int):
         # Always have to do this when making a new model
         super(SSD, self).__init__()
-
 
         self.loc_layers = []
         self.conf_layers = []
 
-        self.base = self.base_net([3, 16, 32, 64])
+        self.backbone = backbone
 
         num_output_channels_per_layer = [64, 128, 128, 128, 128]
 
@@ -40,9 +41,9 @@ class SSD(nn.Module):
             self.conf_layers += self.class_predictor(
                 output_channels, num_anchors, num_classes)
 
-        self.block_1 = self.down_sample_block(64, 128)
-        self.block_2 = self.down_sample_block(128, 128)
-        self.block_3 = self.down_sample_block(128, 128)
+        self.block_1 = DownsampleBlock(64, 128)
+        self.block_2 = DownsampleBlock(128, 128)
+        self.block_3 = DownsampleBlock(128, 128)
 
 
     def forward(self, x):
@@ -50,7 +51,7 @@ class SSD(nn.Module):
         loc = []
         conf = []
 
-        x = self.base(x)
+        x = self.backbone(x)
         feature_maps.append(x)
 
         x = self.block_1(x)
@@ -73,37 +74,6 @@ class SSD(nn.Module):
         conf = torch.cat([o.view(o.size(0), -1) for o in conf], 1)
 
         return (loc, conf)
-
-    def base_net(self, filter_sizes):
-        base = []
-
-        in_channel_list = filter_sizes[:-1]
-        out_channel_list = filter_sizes[1:]
-
-        for idx, (in_channels, out_channels) in enumerate(zip(in_channel_list, out_channel_list)):
-
-            ciel = False
-
-            if idx == 2:
-                ciel = True
-                
-            base.append(self.down_sample_block(
-                in_channels, out_channels, ceil=ciel))
-
-        return nn.Sequential(*base)
-
-    def down_sample_block(self, in_channels, out_channels, ceil=False):
-
-        block = nn.Sequential(
-            nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=1, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(out_channels, out_channels, kernel_size=3, stride=1, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(2, ceil_mode=ceil)
-        )
-
-        return block
-
 
     def class_predictor(self, out_channels, num_anchors, num_classes):
 
