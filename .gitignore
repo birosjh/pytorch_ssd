@@ -2,3 +2,4 @@ __pycache__/
 data/
 tests/test_data/images
 tests/test_data/annotations
+.vscode
