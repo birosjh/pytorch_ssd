@@ -13,3 +13,31 @@ My implementation was heavily influenced by these implementations:
 - https://github.com/kuangliu/pytorch-ssd/blob/master/encoder.py
 
 For training, I used the VOC Dataset 2017 version: http://host.robots.ox.ac.uk/pascal/VOC/
+
+### Environment
+
+This project uses a PyTorch docker container as an environment.
+https://hub.docker.com/r/pytorch/pytorch
+
+1. Build the container
+
+```bash
+docker build . -t ssd
+```
+
+2. Start the container
+
+a. Locally
+```bash
+docker run -itd --name ssd -v $(pwd):/app ssd
+```
+
+b. On Server
+```bash
+docker run -p 6006:6006 --gpus all -itd --name ssd -v .:/app ssd
+```
+
+3. SSH into the container
+```bash
+docker exec -it ssd bash
+```
