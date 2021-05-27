@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader
 from models.explicit_ssd import SSD
 from image_dataset import ImageDataset
 
-class TestModel(unittest.TestCase):
+class TestSSD(unittest.TestCase):
 
     def setUp(self):
 
