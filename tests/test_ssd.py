@@ -5,7 +5,8 @@ import yaml
 
 from torch.utils.data import DataLoader
 
-from models.explicit_ssd import SSD
+from models.backbone.simple import SimpleBackbone
+from models.ssd import SSD
 from image_dataset import ImageDataset
 
 class TestSSD(unittest.TestCase):
@@ -34,10 +35,16 @@ class TestSSD(unittest.TestCase):
 
         num_classes = len(data_config['classes'])
 
-        aspect_ratio_setting_per_feature_map = data_config['aspect_ratios']
+        aspect_ratios = data_config['aspect_ratios']
+
+        layers = model_config['layers']
+        backbone = SimpleBackbone(layers)
 
         self.model = SSD(
-            aspect_ratio_setting_per_feature_map, num_classes).to('cpu')
+            backbone,
+            aspect_ratios,
+            num_classes
+        ).to('cpu')
 
     def test_explicit_model_outputs_properly(self):
 
