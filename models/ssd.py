@@ -10,7 +10,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from layers.downsample_block import DownsampleBlock
+from models.layers.downsample_block import DownsampleBlock
 
 
 class SSD(nn.Module):
