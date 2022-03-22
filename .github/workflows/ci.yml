@@ -4,6 +4,12 @@ jobs:
   check-formatting-compliance:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Lint
+        uses: ./.github/actions/docker-action
+        with:
+          command: "invoke lint"
+
+
       
