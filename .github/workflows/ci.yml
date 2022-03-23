@@ -1,0 +1,20 @@
+name: CI
+on: [push]
+jobs:
+  check-formatting-compliance:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build Container
+        run: docker build . -t ssd
+
+      - name: Run Container
+        run: docker run -itd --name ssd -v $(pwd):/app ssd
+
+      - name: Run linting
+        run: docker exec ssd invoke lint
+
+
+      

@@ -3,3 +3,4 @@ data/
 tests/test_data/images
 tests/test_data/annotations
 .vscode
+**/.DS_Store
