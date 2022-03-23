@@ -1,8 +1,9 @@
 # action.yml
 name: 'Docker Action'
 description: 'Run a command inside the projects primary docker container'
+
 inputs:
-  command_in_docker:
+  command:
     description: 'Command to be run inside of the container.  Defaults to flake8 linting.'
     required: true
     default: 'invoke lint'
@@ -13,4 +14,4 @@ runs:
   using: 'docker'
   image: '../../Dockerfile'
   args:
-    - ${{ inputs.command_in_docker }}
+    - ${{ inputs.command }}
