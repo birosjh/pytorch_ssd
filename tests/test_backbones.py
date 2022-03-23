@@ -1,5 +1,7 @@
 import unittest
 
+import torch
+
 from models.backbone.simple import SimpleBackbone
 
 

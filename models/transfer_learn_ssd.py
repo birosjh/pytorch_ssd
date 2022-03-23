@@ -20,7 +20,7 @@ class SSD(nn.Module):
         self.conv6 = nn.Conv2d(512, 1024, kernel_size=3, padding=6, dilation=6)
         self.conv7 = nn.Conv2d(1024, 1024, kernel_size=1)
 
-        self.extras = create_extras()
+        # self.extras = create_extras()
 
     def forward(self, x):
 
@@ -32,9 +32,9 @@ class SSD(nn.Module):
 
         x = self.extras(x)
 
-    # def create_extras():
+    # def create_extras(self):
 
-    #     # create extras here
+    #     pass
 
     def class_predictor(self, out_channels, num_anchors, num_classes):
 

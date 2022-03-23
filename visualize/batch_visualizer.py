@@ -1,7 +1,6 @@
 import argparse
 
 import cv2
-import torch
 import yaml
 from image_dataset import ImageDataset
 from imgaug.augmentables.bbs import BoundingBox, BoundingBoxesOnImage

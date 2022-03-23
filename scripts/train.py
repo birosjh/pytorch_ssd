@@ -41,9 +41,12 @@ def main():
 
     num_classes = len(data_config["classes"])
 
-    model = SSD(num_classes).to(device)
+    model = SSD(model_config, num_classes).to(device)
+
+    loss_function = None
 
     trainer = Trainer(model, dataset, loss_function, training_config)
+    trainer.train()
 
 
 if __name__ == "__main__":
