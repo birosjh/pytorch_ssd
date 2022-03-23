@@ -12,6 +12,6 @@ outputs:
     description: 'The result of the command'
 runs:
   using: 'docker'
-  image: '../../Dockerfile'
+  image: '../../../Dockerfile'
   args:
     - ${{ inputs.command }}
