@@ -1,7 +1,7 @@
 import unittest
 
 import yaml
-from image_dataset import ImageDataset
+from datasets.image_dataset import ImageDataset
 from torch.utils.data import DataLoader
 
 

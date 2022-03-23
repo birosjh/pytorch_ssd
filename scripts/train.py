@@ -3,7 +3,7 @@ import argparse
 import torch
 import yaml
 from explicit_ssd import SSD
-from image_dataset import ImageDataset
+from datasets.image_dataset import ImageDataset
 from trainer import Trainer
 
 
