@@ -7,6 +7,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Lint
+        id: lint
         uses: ./.github/actions/docker-action
         with:
           command: "invoke lint"

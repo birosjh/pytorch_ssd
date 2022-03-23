@@ -2,12 +2,12 @@
 name: 'Docker Action'
 description: 'Run a command inside the project's primary docker container'
 inputs:
-  command_in_docker:  
+  command_in_docker:
     description: 'Command to be run inside of the container.  Defaults to flake8 linting.'
     required: true
     default: 'invoke lint'
 outputs:
-  result: 
+  result:
     description: 'The result of the command'
 runs:
   using: 'docker'
