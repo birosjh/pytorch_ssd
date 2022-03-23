@@ -6,11 +6,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Lint
-        id: lint
-        uses: ./.github/actions/docker-action
-        with:
-          command: "invoke lint"
+
+      - name: Build Container
+        run: docker build . -t ssd
+
+      - name: Run Container
+        run: docker run -itd --name ssd -v $(pwd):/app ssd
+
+      - name: Run linting
+        run: docker exec ssd invoke python
 
 
       
