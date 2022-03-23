@@ -31,7 +31,7 @@ class TestEncoder(unittest.TestCase):
 
         ious = self.data_encoder.calculate_iou(box1, box2)
 
-        # Compares each value, then gives a single boolean for whether they all match or not
+        # Compares each value, then gives a single boolean for whether they all match or not # noqa: E501
         equivalence_check = torch.all(torch.eq(ious, torch.tensor([[0.2]])))
 
         self.assertTrue(equivalence_check.numpy())
@@ -47,7 +47,7 @@ class TestEncoder(unittest.TestCase):
 
         ious = self.data_encoder.calculate_iou(box1, box2)
 
-        # Compares each value, then gives a single boolean for whether they all match or not
+        # Compares each value, then gives a single boolean for whether they all match or not # noqa: E501
         # One box exists in both box1 and box2 so its value is 1
         # One set of boxes don't overlap at all so they come out to zero
         equivalence_check = torch.all(

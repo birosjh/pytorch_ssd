@@ -32,10 +32,10 @@ def get_box_groups(encoder_config, default_boxes):
         num_aspect_ratios = 2 + len(encoder_config["aspect_ratios"][idx]) * 2
         num_boxes = map_size * map_size * num_aspect_ratios
 
-        boxes_for_this_group = default_boxes[counter:counter + num_boxes]
+        boxes_for_this_group = default_boxes[counter : counter + num_boxes]
 
         box_groups[map_size] = [
-            boxes_for_this_group[i:i + num_aspect_ratios]
+            boxes_for_this_group[i : i + num_aspect_ratios]
             for i in range(0, len(boxes_for_this_group), num_aspect_ratios)
         ]
 

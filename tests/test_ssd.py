@@ -2,9 +2,10 @@ import unittest
 
 import yaml
 from image_dataset import ImageDataset
+from torch.utils.data import DataLoader
+
 from models.backbone.simple import SimpleBackbone
 from models.ssd import SSD
-from torch.utils.data import DataLoader
 
 
 class TestSSD(unittest.TestCase):
