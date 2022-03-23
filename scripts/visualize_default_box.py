@@ -1,20 +1,18 @@
 import argparse
-import yaml
 import random
+
 import cv2
-
-import numpy as np
 import imgaug.augmenters as iaa
-from imgaug.augmentables.bbs import BoundingBox, BoundingBoxesOnImage
-
+import yaml
 from data_encoder import DataEncoder
+from imgaug.augmentables.bbs import BoundingBox, BoundingBoxesOnImage
 
 
 def load_configurations():
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--config', action="store", required=True)
+    parser.add_argument("--config", action="store", required=True)
     arguments = parser.parse_args()
 
     with open(arguments.config) as file:
@@ -29,15 +27,17 @@ def get_box_groups(encoder_config, default_boxes):
 
     counter = 0
 
-    for idx, map_size in enumerate(encoder_config['feature_map_sizes']):
+    for idx, map_size in enumerate(encoder_config["feature_map_sizes"]):
 
-        num_aspect_ratios = 2 + len(encoder_config['aspect_ratios'][idx]) * 2
+        num_aspect_ratios = 2 + len(encoder_config["aspect_ratios"][idx]) * 2
         num_boxes = map_size * map_size * num_aspect_ratios
 
-        boxes_for_this_group = default_boxes[counter:counter + num_boxes]
+        boxes_for_this_group = default_boxes[counter : counter + num_boxes]
 
-        box_groups[map_size] = [boxes_for_this_group[i:i + num_aspect_ratios]
-                                for i in range(0, len(boxes_for_this_group), num_aspect_ratios)]
+        box_groups[map_size] = [
+            boxes_for_this_group[i : i + num_aspect_ratios]
+            for i in range(0, len(boxes_for_this_group), num_aspect_ratios)
+        ]
 
         counter += num_boxes
 
@@ -48,7 +48,7 @@ def main():
 
     config = load_configurations()
 
-    encoder_config = config['simple_model_configuration']
+    encoder_config = config["simple_model_configuration"]
     data_encoder = DataEncoder(encoder_config)
 
     image_path = "data/val_images/000000086220.jpg"
@@ -64,20 +64,14 @@ def main():
 
     set_of_boxes = random.choice(box_groups[10])
 
-    set_of_boxes = (set_of_boxes * 300)
+    set_of_boxes = set_of_boxes * 300
 
     print(set_of_boxes)
 
     vis_boxes = []
 
     for box in set_of_boxes:
-        vis_boxes.append(BoundingBox(
-            x1=box[0], 
-            y1=box[1], 
-            x2=box[2],
-            y2=box[3]
-            )
-        )
+        vis_boxes.append(BoundingBox(x1=box[0], y1=box[1], x2=box[2], y2=box[3]))
 
     bbs = BoundingBoxesOnImage(vis_boxes, shape=resized_image.shape)
 

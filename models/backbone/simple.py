@@ -1,13 +1,9 @@
-
-
-import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 from models.layers.downsample_block import DownsampleBlock
 
-class SimpleBackbone(nn.Module):
 
+class SimpleBackbone(nn.Module):
     def __init__(self, layers):
 
         super(SimpleBackbone, self).__init__()
@@ -22,7 +18,6 @@ class SimpleBackbone(nn.Module):
             base.append(DownsampleBlock(in_channels, out_channels))
 
         self.layers = nn.Sequential(*base)
-
 
     def forward(self, x):
 

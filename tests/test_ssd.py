@@ -1,16 +1,14 @@
-import torch
 import unittest
+
 import yaml
-
-
+from datasets.image_dataset import ImageDataset
 from torch.utils.data import DataLoader
 
 from models.backbone.simple import SimpleBackbone
 from models.ssd import SSD
-from image_dataset import ImageDataset
+
 
 class TestSSD(unittest.TestCase):
-
     def setUp(self):
 
         with open("tests/test_config.yaml") as f:
@@ -20,31 +18,23 @@ class TestSSD(unittest.TestCase):
         training_config = config["training_configuration"]
         data_config = config["data_configuration"]
 
-        dataset = ImageDataset(
-            data_config=data_config,
-            transform=True,
-            mode="train"
-        )
+        dataset = ImageDataset(data_config=data_config, transform=True, mode="train")
 
         self.dataloader = DataLoader(
             dataset,
             batch_size=training_config["batch_size"],
             num_workers=0,
-            shuffle=True
+            shuffle=True,
         )
 
-        num_classes = len(data_config['classes'])
+        num_classes = len(data_config["classes"])
 
-        aspect_ratios = data_config['aspect_ratios']
+        aspect_ratios = data_config["aspect_ratios"]
 
-        layers = model_config['layers']
+        layers = model_config["layers"]
         backbone = SimpleBackbone(layers)
 
-        self.model = SSD(
-            backbone,
-            aspect_ratios,
-            num_classes
-        ).to('cpu')
+        self.model = SSD(backbone, aspect_ratios, num_classes).to("cpu")
 
     def test_explicit_model_outputs_properly(self):
 
@@ -55,5 +45,6 @@ class TestSSD(unittest.TestCase):
         print(loc.shape)
         print(conf.shape)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

@@ -1,10 +1,11 @@
 import unittest
 
+import torch
+
 from models.backbone.simple import SimpleBackbone
 
 
 class TestBackbones(unittest.TestCase):
-
     def setUp(self):
 
         self.backbone = SimpleBackbone([3, 16, 32, 64])
@@ -18,5 +19,5 @@ class TestBackbones(unittest.TestCase):
         print(output.shape)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

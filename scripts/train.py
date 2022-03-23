@@ -1,17 +1,17 @@
 import argparse
+
 import torch
 import yaml
-
 from explicit_ssd import SSD
+from datasets.image_dataset import ImageDataset
 from trainer import Trainer
-from image_dataset import ImageDataset
 
 
 def load_configurations():
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--config', action="store", required=True)
+    parser.add_argument("--config", action="store", required=True)
     arguments = parser.parse_args()
 
     with open(arguments.config) as file:
@@ -19,11 +19,12 @@ def load_configurations():
 
     return config
 
+
 def main():
 
     # Use GPU if available
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    print('Using {} device'.format(device))
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    print("Using {} device".format(device))
 
     config = load_configurations()
 
@@ -38,20 +39,14 @@ def main():
         transform=True,
     )
 
-    num_classes = len(data_config['classes'])
+    num_classes = len(data_config["classes"])
 
-    model = SSD(num_classes).to(device)
+    model = SSD(model_config, num_classes).to(device)
 
-    trainer = Trainer(
-        model, 
-        dataset,
-        loss_function, 
-        training_config
-    )
+    loss_function = None
 
-
-
-
+    trainer = Trainer(model, dataset, loss_function, training_config)
+    trainer.train()
 
 
 if __name__ == "__main__":
