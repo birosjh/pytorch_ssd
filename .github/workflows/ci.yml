@@ -14,7 +14,7 @@ jobs:
         run: docker run -itd --name ssd -v $(pwd):/app ssd
 
       - name: Run linting
-        run: docker exec ssd invoke python
+        run: docker exec ssd invoke lint
 
 
       
