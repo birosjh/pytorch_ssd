@@ -1,6 +1,5 @@
-from simple_ssd import SSD
-
 import torch
+from simple_ssd import SSD
 
 net = SSD(num_classes=1)
 

@@ -9,6 +9,7 @@ Contains models that load a pretrained model from torch hub.
 import torch
 import torch.nn as nn
 
+
 class SSD(nn.Module):
 
     def __init__(self):

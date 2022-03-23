@@ -1,12 +1,11 @@
-import yaml
 import unittest
 
+import yaml
 from image_dataset import ImageDataset
 from torch.utils.data import DataLoader
 
 
 class TestDataloader(unittest.TestCase):
-
     def setUp(self):
 
         with open("tests/test_config.yaml") as f:
@@ -21,14 +20,9 @@ class TestDataloader(unittest.TestCase):
             transform=True,
         )
 
-
     def test_the_shape_a_the_batch(self):
 
-        dataloader = DataLoader(
-            self.dataset,
-            batch_size=self.batch_size,
-            num_workers=0
-        )
+        dataloader = DataLoader(self.dataset, batch_size=self.batch_size, num_workers=0)
 
         images, labels = next(iter(dataloader))
 
@@ -36,8 +30,5 @@ class TestDataloader(unittest.TestCase):
         print(labels.shape)
 
 
-
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
