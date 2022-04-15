@@ -1,9 +1,9 @@
 import unittest
 
 import yaml
-from datasets.image_dataset import ImageDataset
 from torch.utils.data import DataLoader
 
+from datasets.image_dataset import ImageDataset
 from models.backbone.simple import SimpleBackbone
 from models.ssd import SSD
 
