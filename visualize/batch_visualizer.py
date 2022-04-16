@@ -2,9 +2,10 @@ import argparse
 
 import cv2
 import yaml
-from datasets.image_dataset import ImageDataset
 from imgaug.augmentables.bbs import BoundingBox, BoundingBoxesOnImage
 from torch.utils.data import DataLoader
+
+from datasets.image_dataset import ImageDataset
 
 
 def load_configurations():

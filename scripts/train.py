@@ -3,8 +3,9 @@ import argparse
 import torch
 import yaml
 from explicit_ssd import SSD
-from datasets.image_dataset import ImageDataset
 from trainer import Trainer
+
+from datasets.image_dataset import ImageDataset
 
 
 def load_configurations():
