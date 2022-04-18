@@ -2,7 +2,7 @@ import unittest
 
 import torch
 import yaml
-from data_encoder import DataEncoder
+from utils.data_encoder import DataEncoder
 
 
 class TestEncoder(unittest.TestCase):

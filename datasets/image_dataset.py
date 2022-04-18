@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import torch
 import xmltodict
-from data_encoder import DataEncoder
+from utils.data_encoder import DataEncoder
 from imgaug.augmentables.bbs import BoundingBox, BoundingBoxesOnImage
 from torch.utils.data import Dataset
 
