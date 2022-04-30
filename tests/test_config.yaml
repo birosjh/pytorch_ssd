@@ -17,8 +17,8 @@ training_configuration:
 data_configuration:
     train: "tests/test_data/test_data.txt"
     val: "tests/test_data/test_data.txt"
-    image_directory: "tests/test_data/images"
-    annotation_directory: "tests/test_data/annotations"
+    image_directory: "tests/test_data/JPEGImages"
+    annotation_directory: "tests/test_data/Annotations"
     figure_size: 300
     feature_map_sizes: [38, 19, 10, 5, 3, 1]
     steps: [8, 16, 32, 64, 100, 300]
