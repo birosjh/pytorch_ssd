@@ -37,8 +37,6 @@ class SSD(nn.Module):
 
             num_defaults_per_feature_map.append(num_defaults)
 
-        num_defaults_per_feature_map.append(num_defaults)
-
         for num_anchors, output_channels in zip(
             num_defaults_per_feature_map, num_output_channels_per_layer
         ):
