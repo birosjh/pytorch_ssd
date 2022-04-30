@@ -68,7 +68,7 @@ class ImageDataset(Dataset):
         labels = labels.bounding_boxes
 
         labels = torch.Tensor(
-            [np.append(box.coords.flatten(), box.label) for box in labels]
+            np.array([np.append(box.coords.flatten(), box.label) for box in labels])
         )
 
         image = torch.Tensor(image)
