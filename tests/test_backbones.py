@@ -2,13 +2,13 @@ import unittest
 
 import torch
 
-from models.backbone.simple import SimpleBackbone
+from models.backbone.simple import TorchBackbone
 
 
 class TestBackbones(unittest.TestCase):
     def setUp(self):
 
-        self.backbone = SimpleBackbone([3, 16, 32, 64])
+        self.backbone = TorchBackbone([3, 16, 32, 64])
 
     def test_explicit_model_outputs_properly(self):
 

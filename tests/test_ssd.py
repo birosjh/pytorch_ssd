@@ -4,7 +4,7 @@ import yaml
 from torch.utils.data import DataLoader
 
 from datasets.image_dataset import ImageDataset
-from models.backbone.simple import SimpleBackbone
+from models.backbone.simple import TorchBackbone
 from models.ssd import SSD
 
 
@@ -32,7 +32,7 @@ class TestSSD(unittest.TestCase):
         aspect_ratios = data_config["aspect_ratios"]
 
         layers = model_config["layers"]
-        backbone = SimpleBackbone(layers)
+        backbone = TorchBackbone(model_config)
 
         self.model = SSD(backbone, aspect_ratios, num_classes).to("cpu")
 
