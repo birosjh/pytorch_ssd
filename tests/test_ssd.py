@@ -24,7 +24,7 @@ class TestSSD(unittest.TestCase):
             data_config=data_config,
             data_encoder=data_encoder,
             transform=True,
-            mode="train"
+            mode="train",
         )
 
         self.dataloader = DataLoader(
@@ -46,6 +46,8 @@ class TestSSD(unittest.TestCase):
 
         print(loc.shape)
         print(conf.shape)
+
+        # Check if shape is [batch_size, num_outputs, num_default_boxes]
 
 
 if __name__ == "__main__":

@@ -11,7 +11,9 @@ from torch.utils.data import Dataset
 
 
 class ImageDataset(Dataset):
-    def __init__(self, data_config, data_encoder, transform=False, mode="train", visualize=False):
+    def __init__(
+        self, data_config, data_encoder, transform=False, mode="train", visualize=False
+    ):
 
         # Set the mode (train/val)
         self.mode = mode

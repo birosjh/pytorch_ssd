@@ -31,10 +31,10 @@ for line in lines:
 
     copyfile(
         data_path.joinpath(ANNOTATIONS).joinpath(filename + ".xml"),
-        test_data_path.joinpath(ANNOTATIONS).joinpath(filename + ".xml")
+        test_data_path.joinpath(ANNOTATIONS).joinpath(filename + ".xml"),
     )
 
     copyfile(
         data_path.joinpath(JPEGIMAGES).joinpath(filename + ".jpg"),
-        test_data_path.joinpath(JPEGIMAGES).joinpath(filename + ".jpg")
+        test_data_path.joinpath(JPEGIMAGES).joinpath(filename + ".jpg"),
     )
