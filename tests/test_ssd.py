@@ -4,8 +4,8 @@ import yaml
 from torch.utils.data import DataLoader
 
 from datasets.image_dataset import ImageDataset
-from models.backbone.simple import SimpleBackbone
 from models.ssd import SSD
+from utils.data_encoder import DataEncoder
 
 
 class TestSSD(unittest.TestCase):
@@ -18,7 +18,14 @@ class TestSSD(unittest.TestCase):
         training_config = config["training_configuration"]
         data_config = config["data_configuration"]
 
-        dataset = ImageDataset(data_config=data_config, transform=True, mode="train")
+        data_encoder = DataEncoder(model_config)
+
+        dataset = ImageDataset(
+            data_config=data_config,
+            data_encoder=data_encoder,
+            transform=True,
+            mode="train",
+        )
 
         self.dataloader = DataLoader(
             dataset,
@@ -29,12 +36,7 @@ class TestSSD(unittest.TestCase):
 
         num_classes = len(data_config["classes"])
 
-        aspect_ratios = data_config["aspect_ratios"]
-
-        layers = model_config["layers"]
-        backbone = SimpleBackbone(layers)
-
-        self.model = SSD(backbone, aspect_ratios, num_classes).to("cpu")
+        self.model = SSD(model_config, num_classes).to("cpu")
 
     def test_explicit_model_outputs_properly(self):
 
@@ -44,6 +46,8 @@ class TestSSD(unittest.TestCase):
 
         print(loc.shape)
         print(conf.shape)
+
+        # Check if shape is [batch_size, num_outputs, num_default_boxes]
 
 
 if __name__ == "__main__":

@@ -1,22 +1,26 @@
 import unittest
 
-import torch
+import yaml
 
-from models.backbone.simple import SimpleBackbone
+from models.backbone.backbone_loader import backbone_loader
+from models.backbone.vgg16 import Vgg16
 
 
 class TestBackbones(unittest.TestCase):
     def setUp(self):
 
-        self.backbone = SimpleBackbone([3, 16, 32, 64])
+        with open("tests/test_config.yaml") as f:
+            config = yaml.safe_load(f)
 
-    def test_explicit_model_outputs_properly(self):
+        self.model_config = config["model_configuration"]
 
-        x = torch.ones(32, 3, 256, 256)
+    def test_vgg16_can_be_loaded_with_backbone_loader(self):
 
-        output = self.backbone(x)
+        config = {"backbone": "vgg16", "pretrained": False}
 
-        print(output.shape)
+        model = backbone_loader(config)
+
+        self.assertTrue(isinstance(model, Vgg16))
 
 
 if __name__ == "__main__":

@@ -6,13 +6,14 @@ import numpy as np
 import pandas as pd
 import torch
 import xmltodict
-from utils.data_encoder import DataEncoder
 from imgaug.augmentables.bbs import BoundingBox, BoundingBoxesOnImage
 from torch.utils.data import Dataset
 
 
 class ImageDataset(Dataset):
-    def __init__(self, data_config, transform=False, mode="train", visualize=False):
+    def __init__(
+        self, data_config, data_encoder, transform=False, mode="train", visualize=False
+    ):
 
         # Set the mode (train/val)
         self.mode = mode
@@ -38,7 +39,7 @@ class ImageDataset(Dataset):
             {"height": self.height, "width": self.width}
         )
 
-        self.data_encoder = DataEncoder(data_config)
+        self.data_encoder = data_encoder
         self.default_boxes = self.data_encoder.default_boxes
 
     def __len__(self):
@@ -68,7 +69,7 @@ class ImageDataset(Dataset):
         labels = labels.bounding_boxes
 
         labels = torch.Tensor(
-            [np.append(box.coords.flatten(), box.label) for box in labels]
+            np.array([np.append(box.coords.flatten(), box.label) for box in labels])
         )
 
         image = torch.Tensor(image)
