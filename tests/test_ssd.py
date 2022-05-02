@@ -5,6 +5,7 @@ from torch.utils.data import DataLoader
 
 from datasets.image_dataset import ImageDataset
 from models.ssd import SSD
+from utils.data_encoder import DataEncoder
 
 
 class TestSSD(unittest.TestCase):
@@ -17,7 +18,14 @@ class TestSSD(unittest.TestCase):
         training_config = config["training_configuration"]
         data_config = config["data_configuration"]
 
-        dataset = ImageDataset(data_config=data_config, transform=True, mode="train")
+        data_encoder = DataEncoder(model_config)
+
+        dataset = ImageDataset(
+            data_config=data_config,
+            data_encoder=data_encoder,
+            transform=True,
+            mode="train"
+        )
 
         self.dataloader = DataLoader(
             dataset,
@@ -27,8 +35,6 @@ class TestSSD(unittest.TestCase):
         )
 
         num_classes = len(data_config["classes"])
-
-        aspect_ratios = data_config["aspect_ratios"]
 
         self.model = SSD(model_config, num_classes).to("cpu")
 
