@@ -19,6 +19,7 @@ class SSD(nn.Module):
         super(SSD, self).__init__()
 
         self.feature_map_extractor = backbone_loader(config)
+        self.num_classes = num_classes
 
         self.loc_layers = []
         self.conf_layers = []
@@ -48,9 +49,8 @@ class SSD(nn.Module):
         for section in self.feature_map_extractor.model:
 
             x = section(x)
+            print(x.shape)
             feature_maps.append(x)
-
-        print(len(feature_maps))
 
         for idx, feature_map in enumerate(feature_maps):
             loc.append(
@@ -60,18 +60,18 @@ class SSD(nn.Module):
                 self.conf_layers[idx](feature_map).permute(0, 2, 3, 1).contiguous()
             )
 
-        print(loc)
-        print(conf)
-
         loc = torch.cat([o.view(o.size(0), -1) for o in loc], 1)
         conf = torch.cat([o.view(o.size(0), -1) for o in conf], 1)
+
+        loc = loc.view(loc.size(0), 4, -1)
+        conf = conf.view(conf.size(0), self.num_classes, -1)
 
         return (loc, conf)
 
     def class_predictor(self, out_channels, num_anchors, num_classes):
 
         return [
-            nn.Conv2d(out_channels, num_anchors * num_classes, kernel_size=3, padding=1)
+            nn.Conv2d(out_channels, num_anchors * num_classes + 1, kernel_size=3, padding=1)
         ]
 
     def bbox_predictor(self, out_channels, num_anchors):
