@@ -6,6 +6,7 @@ from explicit_ssd import SSD
 from trainer import Trainer
 
 from datasets.image_dataset import ImageDataset
+from utils.data_encoder import DataEncoder
 
 
 def load_configurations():
@@ -35,8 +36,11 @@ def main():
 
     print(config)
 
+    data_encoder = DataEncoder(model_config)
+
     dataset = ImageDataset(
         data_config=data_config,
+        data_encoder=data_encoder,
         transform=True,
     )
 
