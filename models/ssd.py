@@ -71,7 +71,7 @@ class SSD(nn.Module):
     def class_predictor(self, out_channels, num_anchors, num_classes):
 
         return [
-            nn.Conv2d(out_channels, num_anchors * num_classes + 1, kernel_size=3, padding=1)
+            nn.Conv2d(out_channels, num_anchors * num_classes, kernel_size=3, padding=1)
         ]
 
     def bbox_predictor(self, out_channels, num_anchors):

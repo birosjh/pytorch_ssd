@@ -44,7 +44,7 @@ def main():
         transform=True,
     )
 
-    num_classes = len(data_config["classes"])
+    num_classes = len(data_config["classes"]) + 1
 
     model = SSD(model_config, num_classes).to(device)
 
