@@ -49,7 +49,6 @@ class SSD(nn.Module):
         for section in self.feature_map_extractor.model:
 
             x = section(x)
-            print(x.shape)
             feature_maps.append(x)
 
         for idx, feature_map in enumerate(feature_maps):

@@ -1,5 +1,6 @@
-from torch.nn import MaxPool2d, Module, Sequential
 import torchvision.models as models
+from torch.nn import MaxPool2d, Module, Sequential
+
 from models.layers.downsample_block import DownsampleBlock
 
 

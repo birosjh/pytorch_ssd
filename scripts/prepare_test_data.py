@@ -1,6 +1,6 @@
 import os
-from shutil import copyfile
 from pathlib import Path
+from shutil import copyfile
 
 ANNOTATIONS: str = "Annotations"
 JPEGIMAGES: str = "JPEGImages"

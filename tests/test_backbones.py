@@ -1,6 +1,7 @@
 import unittest
-import yaml
+
 import torch
+import yaml
 
 from models.backbone.backbone_loader import backbone_loader
 from models.backbone.vgg16 import Vgg16
