@@ -1,6 +1,5 @@
 import unittest
 
-import torch
 import yaml
 
 from models.backbone.backbone_loader import backbone_loader
