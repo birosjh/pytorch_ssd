@@ -10,6 +10,7 @@ model_configuration:
 
 training_configuration:
     learning_rate: 0.001
+    alpha: 0.9
     batch_size: 4
     epochs: 50
     num_workers: 0
