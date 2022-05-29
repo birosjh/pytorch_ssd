@@ -9,9 +9,11 @@ Contains a trainer to train an SSD model with the specified dataset.
 import torch
 from torch.utils.data import DataLoader
 
+from models.loss.ssd import SSDLoss
+
 
 class Trainer:
-    def __init__(self, model, dataset, loss_function, training_config):
+    def __init__(self, model, dataset, default_boxes, training_config):
 
         self.model = model
 
@@ -25,7 +27,10 @@ class Trainer:
             model.parameters(), lr=training_config["learning_rate"]
         )
 
-        self.loss_function = loss_function
+        self.loss = SSDLoss()
+
+        self.alpha = training_config["alpha"]
+        self.default_boxes = default_boxes
 
         self.epochs = training_config["epochs"]
 
@@ -35,10 +40,11 @@ class Trainer:
             print("Epoch {}/{}".format(epoch, self.epochs - 1))
             print("-" * 10)
 
-            for X, y in self.dataloader:
+            for images, targets in self.dataloader:
                 # Compute prediction and loss
-                pred = self.model(X)
-                loss = self.loss_function(pred, y)
+                predictions = self.model(images)
+
+                conf_loss, loc_loss, loss = self.loss(predictions, targets)
 
                 # Backpropagation
                 self.optimizer.zero_grad()

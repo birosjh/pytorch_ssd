@@ -8,9 +8,9 @@ Contains a model with the layers explicitly written out.
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 from models.backbone.backbone_loader import backbone_loader
+from utils.default_box import number_of_default_boxes_per_cell
 
 
 class SSD(nn.Module):
@@ -24,16 +24,13 @@ class SSD(nn.Module):
         self.loc_layers = []
         self.conf_layers = []
 
-        num_defaults_per_feature_map = []
+        num_defaults_per_cell = number_of_default_boxes_per_cell(
+            config["aspect_ratios"]
+        )
 
-        for aspect_ratio_setting in config["aspect_ratios"]:
+        output_channels = self.feature_map_extractor.output_channels()
 
-            num_defaults = 2 + len(aspect_ratio_setting) * 2
-            num_defaults_per_feature_map.append(num_defaults)
-
-        for num_anchors, output_channels in zip(
-            num_defaults_per_feature_map, self.feature_map_extractor.output_channels()
-        ):
+        for num_anchors, output_channels in zip(num_defaults_per_cell, output_channels):
 
             self.loc_layers += self.bbox_predictor(output_channels, num_anchors)
             self.conf_layers += self.class_predictor(
@@ -62,8 +59,8 @@ class SSD(nn.Module):
         loc = torch.cat([o.view(o.size(0), -1) for o in loc], 1)
         conf = torch.cat([o.view(o.size(0), -1) for o in conf], 1)
 
-        loc = loc.view(loc.size(0), 4, -1)
-        conf = conf.view(conf.size(0), self.num_classes, -1)
+        loc = loc.view(loc.size(0), -1, 4)
+        conf = conf.view(conf.size(0), -1, self.num_classes)
 
         return (loc, conf)
 

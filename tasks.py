@@ -2,6 +2,12 @@ from invoke import task
 
 
 @task
+def train(c, filename="configs/config.yaml"):
+
+    c.run(f"python scripts/train.py --config {filename}")
+
+
+@task
 def lint(c, filename="."):
 
     c.run(f"flake8 {filename}")
