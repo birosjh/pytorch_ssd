@@ -46,7 +46,7 @@ def main():
 
     model = SSD(model_config, num_classes).to(device)
 
-    default_boxes = self.data_encoder.default_boxes
+    default_boxes = data_encoder.default_boxes
 
     trainer = Trainer(model, dataset, default_boxes, training_config)
     trainer.train()

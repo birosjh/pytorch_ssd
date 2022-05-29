@@ -8,7 +8,6 @@ Contains a model with the layers explicitly written out.
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 from models.backbone.backbone_loader import backbone_loader
 from utils.default_box import number_of_default_boxes_per_cell

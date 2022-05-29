@@ -10,6 +10,6 @@ class LocalizationLoss(nn.Module):
 
         self.smooth_l1 = nn.SmoothL1Loss()
 
-    def forward(predictions, targets):
+    def forward(self, predictions, targets):
 
-        return self.smooth_l1(predictions - adjusted_targets)
+        return self.smooth_l1(predictions - targets)

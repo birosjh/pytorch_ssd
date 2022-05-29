@@ -7,7 +7,6 @@ Contains a trainer to train an SSD model with the specified dataset.
 """
 
 import torch
-import torch.nn as nn
 from torch.utils.data import DataLoader
 
 from models.loss.ssd import SSDLoss
@@ -28,6 +27,8 @@ class Trainer:
             model.parameters(), lr=training_config["learning_rate"]
         )
 
+        self.loss = SSDLoss()
+
         self.alpha = training_config["alpha"]
         self.default_boxes = default_boxes
 
@@ -41,7 +42,7 @@ class Trainer:
 
             for images, targets in self.dataloader:
                 # Compute prediction and loss
-                pred_loc, pred_conf = self.model(images)
+                predictions = self.model(images)
 
                 conf_loss, loc_loss, loss = self.loss(predictions, targets)
 
