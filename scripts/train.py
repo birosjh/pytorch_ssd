@@ -34,8 +34,6 @@ def main():
     training_config = config["training_configuration"]
     data_config = config["data_configuration"]
 
-    print(config)
-
     data_encoder = DataEncoder(model_config)
 
     dataset = ImageDataset(
@@ -48,9 +46,9 @@ def main():
 
     model = SSD(model_config, num_classes).to(device)
 
-    loss_function = None
+    default_boxes = self.data_encoder.default_boxes
 
-    trainer = Trainer(model, dataset, loss_function, training_config)
+    trainer = Trainer(model, dataset, default_boxes, training_config)
     trainer.train()
 
 
