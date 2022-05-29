@@ -1,4 +1,3 @@
-
 def number_of_default_boxes_per_cell(aspect_ratios: list) -> list:
 
     num_defaults_per_cell = []
@@ -10,6 +9,7 @@ def number_of_default_boxes_per_cell(aspect_ratios: list) -> list:
 
     return num_defaults_per_cell
 
+
 def total_number_of_default_boxes(num_defaults_per_cell, feature_map_sizes):
 
     total = 0
@@ -19,4 +19,3 @@ def total_number_of_default_boxes(num_defaults_per_cell, feature_map_sizes):
         total += ratio * size * size
 
     return total
-

@@ -31,9 +31,7 @@ class SSD(nn.Module):
 
         output_channels = self.feature_map_extractor.output_channels()
 
-        for num_anchors, output_channels in zip(
-            num_defaults_per_cell, output_channels
-        ):
+        for num_anchors, output_channels in zip(num_defaults_per_cell, output_channels):
 
             self.loc_layers += self.bbox_predictor(output_channels, num_anchors)
             self.conf_layers += self.class_predictor(

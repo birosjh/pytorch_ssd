@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+
 from models.loss.localization import LocalizationLoss
 
 
@@ -17,17 +18,17 @@ class SSDLoss(nn.Module):
         target_confidences = targets[:, 0, :]
         target_localizations = targets[:, 1:, :]
 
-        confidence_loss = self.confidence_loss(
-            pred_confidences,
-            conf_targets
-        )
+        confidence_loss = self.confidence_loss(pred_confidences, conf_targets)
 
-        matched_pred_localizations = pred_localizations[pred_confidences == target_confidences]
-        matched_target_localizations = target_localizations[pred_confidences == target_confidences]
+        matched_pred_localizations = pred_localizations[
+            pred_confidences == target_confidences
+        ]
+        matched_target_localizations = target_localizations[
+            pred_confidences == target_confidences
+        ]
 
         localization_loss = self.localization_loss(
-            matched_pred_localizations,
-            matched_target_localizations
+            matched_pred_localizations, matched_target_localizations
         )
 
         loss = (1 / num_matched) * (conf_loss + self.alpha * loc_loss)

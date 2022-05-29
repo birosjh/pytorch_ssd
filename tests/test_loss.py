@@ -4,9 +4,9 @@ import yaml
 from torch.utils.data import DataLoader
 
 from datasets.image_dataset import ImageDataset
+from models.loss.confidence import localization_loss
 from models.ssd import SSD
 from utils.data_encoder import DataEncoder
-from models.loss.confidence import localization_loss
 
 
 class TestLoss(unittest.TestCase):

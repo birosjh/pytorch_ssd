@@ -9,7 +9,9 @@ Contains a trainer to train an SSD model with the specified dataset.
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
+
 from models.loss.ssd import SSDLoss
+
 
 class Trainer:
     def __init__(self, model, dataset, default_boxes, training_config):
@@ -26,7 +28,6 @@ class Trainer:
             model.parameters(), lr=training_config["learning_rate"]
         )
 
-        
         self.alpha = training_config["alpha"]
         self.default_boxes = default_boxes
 
