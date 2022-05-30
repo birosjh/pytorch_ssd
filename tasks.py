@@ -4,7 +4,7 @@ from invoke import task
 @task
 def train(c, filename="configs/config.yaml"):
 
-    c.run(f"python scripts/train.py --config {filename}")
+    c.run(f"python3 train.py --config {filename}")
 
 
 @task
@@ -24,7 +24,7 @@ def format(c, filename="."):
 @task
 def test(c, filename="*"):
 
-    c.run(f"python -m unittest tests/test_{filename}.py")
+    c.run(f"python3 -m unittest tests/test_{filename}.py")
 
 
 @task

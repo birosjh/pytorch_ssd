@@ -15,9 +15,9 @@ training_configuration:
     num_workers: 0
 
 data_configuration:
-    train: "tests/test_data/test_data.txt"
-    val: "tests/test_data/test_data.txt"
-    image_directory: "tests/test_data/JPEGImages"
-    annotation_directory: "tests/test_data/Annotations"
+    train: "./data/train_sample.txt"
+    val: "./data/val_sample.txt"
+    image_directory: "./data/JPEGImages"
+    annotation_directory: "./data/Annotations"
     figure_size: 256
     classes: ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus', 'car', 'cat', 'chair', 'cow', 'diningtable', 'dog', 'horse', 'motorbike', 'person', 'pottedplant', 'sheep', 'sofa', 'train', 'tvmonitor']
