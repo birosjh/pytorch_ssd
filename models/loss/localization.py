@@ -7,9 +7,10 @@ class LocalizationLoss(nn.Module):
     """
 
     def __init__(self):
+        super(LocalizationLoss, self).__init__()
 
         self.smooth_l1 = nn.SmoothL1Loss()
 
     def forward(self, predictions, targets):
 
-        return self.smooth_l1(predictions - targets)
+        return self.smooth_l1(predictions, targets)
