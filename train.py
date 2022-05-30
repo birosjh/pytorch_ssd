@@ -2,10 +2,10 @@ import argparse
 
 import torch
 import yaml
-from models.ssd import SSD
-from trainer.trainer import Trainer
 
 from datasets.image_dataset import ImageDataset
+from models.ssd import SSD
+from trainer.trainer import Trainer
 from utils.data_encoder import DataEncoder
 
 
@@ -43,10 +43,7 @@ def main():
     )
 
     val_dataset = ImageDataset(
-        data_config=data_config,
-        data_encoder=data_encoder,
-        transform=False,
-        mode="val"
+        data_config=data_config, data_encoder=data_encoder, transform=False, mode="val"
     )
 
     num_classes = len(data_config["classes"]) + 1
