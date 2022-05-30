@@ -1,0 +1,23 @@
+model_configuration:
+    backbone: "vgg16"
+    pretrained: False
+    figure_size: 256
+    feature_map_sizes: [32, 16, 8, 4, 2, 1]
+    steps: [8, 16, 32, 64, 100, 300]
+    scales: [30, 60, 111, 162, 213, 264, 315]
+    aspect_ratios: [[2], [2,3], [2,3], [2,3], [2], [2]]
+
+training_configuration:
+    learning_rate: 0.001
+    alpha: 0.9
+    batch_size: 4
+    epochs: 50
+    num_workers: 0
+
+data_configuration:
+    train: "./data/train_sample.txt"
+    val: "./data/val_sample.txt"
+    image_directory: "./data/JPEGImages"
+    annotation_directory: "./data/Annotations"
+    figure_size: 256
+    classes: ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus', 'car', 'cat', 'chair', 'cow', 'diningtable', 'dog', 'horse', 'motorbike', 'person', 'pottedplant', 'sheep', 'sofa', 'train', 'tvmonitor']
