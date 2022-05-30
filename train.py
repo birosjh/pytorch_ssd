@@ -3,7 +3,7 @@ import argparse
 import torch
 import yaml
 from models.ssd import SSD
-from trainer import Trainer
+from trainer.trainer import Trainer
 
 from datasets.image_dataset import ImageDataset
 from utils.data_encoder import DataEncoder

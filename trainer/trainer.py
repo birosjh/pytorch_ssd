@@ -6,6 +6,7 @@ Contains a trainer to train an SSD model with the specified dataset.
 
 """
 
+from tqdm import tqdm
 import torch
 from torch.utils.data import DataLoader
 
@@ -27,10 +28,9 @@ class Trainer:
             model.parameters(), lr=training_config["learning_rate"]
         )
 
-        self.loss = SSDLoss()
-
-        self.alpha = training_config["alpha"]
         self.default_boxes = default_boxes
+
+        self.loss = SSDLoss(alpha=training_config["alpha"])
 
         self.epochs = training_config["epochs"]
 
@@ -40,7 +40,7 @@ class Trainer:
             print("Epoch {}/{}".format(epoch, self.epochs - 1))
             print("-" * 10)
 
-            for images, targets in self.dataloader:
+            for images, targets in tqdm(self.dataloader):
                 # Compute prediction and loss
                 predictions = self.model(images)
 
