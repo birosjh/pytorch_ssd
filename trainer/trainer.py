@@ -51,15 +51,9 @@ class Trainer:
             print("Epoch {}/{}".format(epoch, self.epochs - 1))
             print("-" * 10)
 
-            #self.train_one_epoch()
+            self.train_one_epoch()
 
-            try:
-
-                self.validate_one_epoch()
-
-            except Exception as e:
-
-                print(e)
+            self.validate_one_epoch()
 
                 
     def train_one_epoch(self):
