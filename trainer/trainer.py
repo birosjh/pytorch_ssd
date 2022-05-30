@@ -51,9 +51,15 @@ class Trainer:
             print("Epoch {}/{}".format(epoch, self.epochs - 1))
             print("-" * 10)
 
-            self.train_one_epoch()
+            #self.train_one_epoch()
 
-            self.validate_one_epoch()
+            try:
+
+                self.validate_one_epoch()
+
+            except Exception as e:
+
+                print(e)
 
                 
     def train_one_epoch(self):
@@ -64,6 +70,8 @@ class Trainer:
         epoch_conf_loss = 0
         epoch_loc_loss = 0
         epoch_loss = 0
+
+        self.model.train()
 
         for images, targets in tqdm(self.train_dataloader):
             # Compute prediction and loss
@@ -98,15 +106,19 @@ class Trainer:
         epoch_val_loc_loss = 0
         epoch_val_loss = 0
 
-        for images, targets in tqdm(self.val_dataloader):
-                
-            predictions = self.model(images)
+        self.model.eval()
 
-            conf_loss, loc_loss, loss = self.loss(predictions, targets)
+        with torch.no_grad():
 
-            epoch_val_conf_loss += conf_loss
-            epoch_val_loc_loss += loc_loss
-            epoch_val_loss += loss
+            for images, targets in tqdm(self.val_dataloader):
+                    
+                predictions = self.model(images)
+
+                conf_loss, loc_loss, loss = self.loss(predictions, targets)
+
+                epoch_val_conf_loss += conf_loss
+                epoch_val_loc_loss += loc_loss
+                epoch_val_loss += loss
 
             # TODO: Calculate mAP
 
