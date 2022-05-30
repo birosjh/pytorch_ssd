@@ -1,5 +1,4 @@
 model_configuration:
-    base: "torch"
     backbone: "vgg16"
     pretrained: False
     figure_size: 256
