@@ -62,7 +62,7 @@ class SSD(nn.Module):
         loc = loc.view(loc.size(0), -1, 4)
         conf = conf.view(conf.size(0), -1, self.num_classes)
 
-        return (loc, conf)
+        return (conf, loc)
 
     def class_predictor(self, out_channels, num_anchors, num_classes):
 
