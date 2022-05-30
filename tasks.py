@@ -4,7 +4,7 @@ from invoke import task
 @task
 def train(c, filename="configs/config.yaml"):
 
-    c.run(f"python3 scripts/train.py --config {filename}")
+    c.run(f"python3 train.py --config {filename}")
 
 
 @task
