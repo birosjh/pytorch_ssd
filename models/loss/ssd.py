@@ -36,6 +36,9 @@ class SSDLoss(nn.Module):
 
         num_matched = torch.sum(pred_confidences == target_confidences)
 
-        loss = (1 / num_matched) * (confidence_loss + self.alpha * localization_loss)
+        confidence_loss /= num_matched
+        localization_loss /= num_matched
+
+        loss = confidence_loss + self.alpha * localization_loss
 
         return confidence_loss, localization_loss, loss
