@@ -36,19 +36,24 @@ def main():
 
     data_encoder = DataEncoder(model_config)
 
-    dataset = ImageDataset(
+    train_dataset = ImageDataset(
         data_config=data_config,
         data_encoder=data_encoder,
         transform=True,
+    )
+
+    val_dataset = ImageDataset(
+        data_config=data_config,
+        data_encoder=data_encoder,
+        transform=False,
+        mode="val"
     )
 
     num_classes = len(data_config["classes"]) + 1
 
     model = SSD(model_config, num_classes).to(device)
 
-    default_boxes = data_encoder.default_boxes
-
-    trainer = Trainer(model, dataset, default_boxes, training_config)
+    trainer = Trainer(model, train_dataset, val_dataset, training_config)
     trainer.train()
 
 
