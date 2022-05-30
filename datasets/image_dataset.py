@@ -74,8 +74,7 @@ class ImageDataset(Dataset):
 
         image = torch.Tensor(image)
 
-        if self.mode == "train":
-            labels = self.data_encoder.encode(labels)
+        labels = self.data_encoder.encode(labels)
 
         if self.visualize:
 
