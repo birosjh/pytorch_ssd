@@ -1,10 +1,17 @@
 from invoke import task
 
+from visualize.visualize_batch import visualize_batch
+
 
 @task
 def train(c, filename="configs/config.yaml"):
 
     c.run(f"python3 train.py --config {filename}")
+
+@task
+def visualize_a_batch(c, filename="configs/config.yaml", use_val=False):
+
+    visualize_batch(filename, use_val)
 
 
 @task
