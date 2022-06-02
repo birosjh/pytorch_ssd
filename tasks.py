@@ -8,6 +8,7 @@ def train(c, filename="configs/config.yaml"):
 
     c.run(f"python3 train.py --config {filename}")
 
+
 @task
 def visualize_a_batch(c, filename="configs/config.yaml", use_val=False):
 

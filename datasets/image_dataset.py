@@ -6,6 +6,7 @@ import pandas as pd
 import torch
 import xmltodict
 from torch.utils.data import Dataset
+
 from datasets.transformations import Transformations
 from utils.data_encoder import DataEncoder
 
@@ -16,7 +17,11 @@ class ImageDataset(Dataset):
     """
 
     def __init__(
-        self, data_config: dict, data_encoder: DataEncoder, mode: str = "train", visualize: bool = False
+        self,
+        data_config: dict,
+        data_encoder: DataEncoder,
+        mode: str = "train",
+        visualize: bool = False,
     ):
 
         self.visualize = visualize
@@ -77,7 +82,7 @@ class ImageDataset(Dataset):
         Creates a list of files from the specified text file
 
         Args:
-            file_data_path (str): Path to the file containing names of all files used in the dataset
+            file_data_path (str): Path to the file containing data file names
 
         Returns:
             list: Returns a list of the names of all files in the dataset
@@ -134,12 +139,14 @@ class ImageDataset(Dataset):
 
             box = obj["bndbox"]
 
-            labels.append([
+            labels.append(
+                [
                     float(box["xmin"]),
                     float(box["ymin"]),
                     float(box["xmax"]),
                     float(box["ymax"]),
-                    self.classes.index(obj["name"])
-            ])
+                    self.classes.index(obj["name"]),
+                ]
+            )
 
         return labels

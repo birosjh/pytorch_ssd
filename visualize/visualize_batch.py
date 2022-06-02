@@ -1,10 +1,9 @@
-import argparse
+from pathlib import Path
 
 import cv2
-import yaml
 import matplotlib.cm as cm
 import numpy as np
-from pathlib import Path
+import yaml
 from torch.utils.data import DataLoader
 
 from datasets.image_dataset import ImageDataset
@@ -13,11 +12,19 @@ from utils.data_encoder import DataEncoder
 BOX_COLOR = (0, 0, 0)
 TEXT_COLOR = (0, 0, 0)
 
+
 def get_color_from_list(class_id: int, color_list: list) -> tuple:
 
     return tuple((color_list[class_id] * 256)[0:-1].astype(int).tolist())
 
-def visualize_bbox(image: np.ndarray, label: np.ndarray, color_list: list, class_names: list, thickness=2) -> np.ndarray:
+
+def visualize_bbox(
+    image: np.ndarray,
+    label: np.ndarray,
+    color_list: list,
+    class_names: list,
+    thickness=2,
+) -> np.ndarray:
     """
     Visualizes a single bounding box on the image
 
@@ -39,21 +46,19 @@ def visualize_bbox(image: np.ndarray, label: np.ndarray, color_list: list, class
     color = get_color_from_list(class_id, color_list)
 
     cv2.rectangle(
-        image, 
-        (x_min, y_min), 
-        (x_max, y_max), 
-        color=color, 
-        thickness=thickness
+        image, (x_min, y_min), (x_max, y_max), color=color, thickness=thickness
     )
-    
-    ((text_width, text_height), _) = cv2.getTextSize(class_name, cv2.FONT_HERSHEY_SIMPLEX, 0.35, 1) 
+
+    ((text_width, text_height), _) = cv2.getTextSize(
+        class_name, cv2.FONT_HERSHEY_SIMPLEX, 0.35, 1
+    )
 
     cv2.rectangle(
-        image, 
+        image,
         (x_min, y_min),
         (x_min + text_width, y_min + int(1.3 * text_height)),
-        color=color, 
-        thickness=-1
+        color=color,
+        thickness=-1,
     )
 
     cv2.putText(
@@ -61,11 +66,12 @@ def visualize_bbox(image: np.ndarray, label: np.ndarray, color_list: list, class
         text=class_name,
         org=(x_min, y_min + int(text_height)),
         fontFace=cv2.FONT_HERSHEY_SIMPLEX,
-        fontScale=0.35, 
-        color=TEXT_COLOR, 
+        fontScale=0.35,
+        color=TEXT_COLOR,
         lineType=cv2.LINE_AA,
     )
     return image
+
 
 def visualize_batch(config_path: str, val: bool = False) -> None:
     """
@@ -92,9 +98,7 @@ def visualize_batch(config_path: str, val: bool = False) -> None:
     data_encoder = DataEncoder(model_config)
 
     dataset = ImageDataset(
-        data_config=data_config,
-        data_encoder=data_encoder,
-        mode=mode
+        data_config=data_config, data_encoder=data_encoder, mode=mode
     )
 
     dataloader = DataLoader(
@@ -112,18 +116,18 @@ def visualize_batch(config_path: str, val: bool = False) -> None:
 
         np_image = image.permute(1, 2, 0).numpy().copy().astype(np.uint8)
 
-        np_labels = labelset[labelset[:,-1] > 0].numpy().astype(int)
+        np_labels = labelset[labelset[:, -1] > 0].numpy().astype(int)
 
         for label in np_labels:
 
-            np_image = visualize_bbox(np_image, label, color_list, data_config["classes"])
+            np_image = visualize_bbox(
+                np_image, label, color_list, data_config["classes"]
+            )
 
-        bbs_applied_images.append(
-            np_image
-        )
+        bbs_applied_images.append(np_image)
 
     batch_image = cv2.vconcat(bbs_applied_images)
 
     file_name = Path("visualize") / "visualized_batch.jpg"
-    
+
     cv2.imwrite(str(file_name.absolute()), batch_image)
