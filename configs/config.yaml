@@ -21,3 +21,7 @@ data_configuration:
     annotation_directory: "./data/Annotations"
     figure_size: 256
     classes: ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus', 'car', 'cat', 'chair', 'cow', 'diningtable', 'dog', 'horse', 'motorbike', 'person', 'pottedplant', 'sheep', 'sofa', 'train', 'tvmonitor']
+
+    transformations:
+        figure_size: 256 # Regardless of transform settings this will be applied
+        transform: True
