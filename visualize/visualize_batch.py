@@ -5,7 +5,6 @@ import yaml
 import matplotlib.cm as cm
 import numpy as np
 from pathlib import Path
-from imgaug.augmentables.bbs import BoundingBox, BoundingBoxesOnImage
 from torch.utils.data import DataLoader
 
 from datasets.image_dataset import ImageDataset
