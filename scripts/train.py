@@ -1,5 +1,3 @@
-import argparse
-
 import torch
 import yaml
 
@@ -9,26 +7,20 @@ from trainer.trainer import Trainer
 from utils.data_encoder import DataEncoder
 
 
-def load_configurations():
+def train_model(config_path: str) -> None:
+    """
+    A function to train the SSD model
 
-    parser = argparse.ArgumentParser()
+    Args:
+        config_path (str): Path to desired config file
+    """
 
-    parser.add_argument("--config", action="store", required=True)
-    arguments = parser.parse_args()
-
-    with open(arguments.config) as file:
+    with open(config_path) as file:
         config = yaml.safe_load(file)
-
-    return config
-
-
-def main():
 
     # Use GPU if available
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print("Using {} device".format(device))
-
-    config = load_configurations()
 
     model_config = config["model_configuration"]
     training_config = config["training_configuration"]
@@ -39,11 +31,11 @@ def main():
     train_dataset = ImageDataset(
         data_config=data_config,
         data_encoder=data_encoder,
-        transform=True,
+        mode="train",
     )
 
     val_dataset = ImageDataset(
-        data_config=data_config, data_encoder=data_encoder, transform=False, mode="val"
+        data_config=data_config, data_encoder=data_encoder, mode="val"
     )
 
     num_classes = len(data_config["classes"]) + 1
@@ -52,8 +44,3 @@ def main():
 
     trainer = Trainer(model, train_dataset, val_dataset, training_config)
     trainer.train()
-
-
-if __name__ == "__main__":
-
-    main()

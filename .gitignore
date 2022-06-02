@@ -1,5 +1,6 @@
 __pycache__/
 data/
+visualize/*.jpg
 tests/test_data/JPEGImages
 tests/test_data/Annotations
 .vscode

@@ -1,22 +1,28 @@
 import os
 
 import cv2
-import imgaug.augmenters as iaa
 import numpy as np
 import pandas as pd
 import torch
 import xmltodict
-from imgaug.augmentables.bbs import BoundingBox, BoundingBoxesOnImage
 from torch.utils.data import Dataset
+
+from datasets.transformations import Transformations
+from utils.data_encoder import DataEncoder
 
 
 class ImageDataset(Dataset):
-    def __init__(
-        self, data_config, data_encoder, transform=False, mode="train", visualize=False
-    ):
+    """
+    A PyTorch Dataset for Pascal VOC Data
+    """
 
-        # Set the mode (train/val)
-        self.mode = mode
+    def __init__(
+        self,
+        data_config: dict,
+        data_encoder: DataEncoder,
+        mode: str = "train",
+        visualize: bool = False,
+    ):
 
         self.visualize = visualize
 
@@ -28,16 +34,10 @@ class ImageDataset(Dataset):
 
         self.file_list = self.create_file_list(file_data_path)
 
-        self.transform = transform
+        self.transformations = Transformations(data_config["transformations"], mode)
 
-        self.transformations = iaa.Noop()
-
-        self.height = data_config["figure_size"]
-        self.width = data_config["figure_size"]
-
-        self.resize_transformation = iaa.Resize(
-            {"height": self.height, "width": self.width}
-        )
+        self.height = data_config["transformations"]["figure_size"]
+        self.width = data_config["transformations"]["figure_size"]
 
         self.data_encoder = data_encoder
         self.default_boxes = self.data_encoder.default_boxes
@@ -45,7 +45,7 @@ class ImageDataset(Dataset):
     def __len__(self):
         return len(self.file_list)
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: int):
 
         # Select filename from list
         filename = self.file_list[idx]
@@ -56,21 +56,13 @@ class ImageDataset(Dataset):
         # Load annotations for image
         labels = self.load_labels_from_annotation(filename)
 
-        labels = BoundingBoxesOnImage(labels, shape=image.shape)
-
         # Perform transformations on the data
-        if self.transform:
+        transformed_data = self.transformations(image=image, bounding_boxes=labels)
 
-            image, labels = self.transformations(image=image, bounding_boxes=labels)
+        image = transformed_data["image"]
+        labels = transformed_data["bboxes"]
 
-        # Resize data regardless of train or test
-        image, labels = self.resize_transformation(image=image, bounding_boxes=labels)
-
-        labels = labels.bounding_boxes
-
-        labels = torch.Tensor(
-            np.array([np.append(box.coords.flatten(), box.label) for box in labels])
-        )
+        labels = torch.Tensor(labels)
 
         image = torch.Tensor(image)
 
@@ -86,6 +78,15 @@ class ImageDataset(Dataset):
         return (image, labels)
 
     def create_file_list(self, file_data_path: str) -> list:
+        """
+        Creates a list of files from the specified text file
+
+        Args:
+            file_data_path (str): Path to the file containing data file names
+
+        Returns:
+            list: Returns a list of the names of all files in the dataset
+        """
 
         df = pd.read_csv(file_data_path, names=["filename"])
 
@@ -96,6 +97,15 @@ class ImageDataset(Dataset):
         return file_list
 
     def load_image(self, filename: str) -> np.array:
+        """
+        Loads a single image from the image directory
+
+        Args:
+            filename (str): Filename of the image to be loaded
+
+        Returns:
+            np.array: An image in the format of a numpy array
+        """
 
         path_to_file = os.path.join(self.image_directory, filename + ".jpg")
         image = cv2.imread(path_to_file)
@@ -103,6 +113,15 @@ class ImageDataset(Dataset):
         return image
 
     def load_labels_from_annotation(self, filename: str) -> list:
+        """
+        Loads labels from an annotation file
+
+        Args:
+            filename (str): Name of the annotation file
+
+        Returns:
+            list: A list of labels
+        """
 
         path_to_file = os.path.join(self.annotation_directory, filename + ".xml")
 
@@ -121,13 +140,13 @@ class ImageDataset(Dataset):
             box = obj["bndbox"]
 
             labels.append(
-                BoundingBox(
-                    x1=box["xmin"],
-                    y1=box["ymin"],
-                    x2=box["xmax"],
-                    y2=box["ymax"],
-                    label=self.classes.index(obj["name"]),
-                )
+                [
+                    float(box["xmin"]),
+                    float(box["ymin"]),
+                    float(box["xmax"]),
+                    float(box["ymax"]),
+                    self.classes.index(obj["name"]),
+                ]
             )
 
         return labels
