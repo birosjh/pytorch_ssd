@@ -80,7 +80,8 @@ def visualize_batch(config_path: str, val: bool = False) -> None:
 
     Args:
         config_path (str): Path to the desired config  file
-        val (bool, optional): Whether to use a validation data loader or not. Defaults to False.
+        val (bool, optional): Whether to use a validation data loader or not.
+            Defaults to False.
     """
 
     with open(config_path) as file:
