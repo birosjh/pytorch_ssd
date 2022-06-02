@@ -1,22 +1,18 @@
 import os
 
 import cv2
-import imgaug.augmenters as iaa
 import numpy as np
 import pandas as pd
 import torch
 import xmltodict
-from imgaug.augmentables.bbs import BoundingBox, BoundingBoxesOnImage
 from torch.utils.data import Dataset
+from datasets.transformations import Transformations
 
 
 class ImageDataset(Dataset):
     def __init__(
-        self, data_config, data_encoder, transform=False, mode="train", visualize=False
+        self, data_config, data_encoder, mode="train", visualize=False
     ):
-
-        # Set the mode (train/val)
-        self.mode = mode
 
         self.visualize = visualize
 
@@ -28,16 +24,10 @@ class ImageDataset(Dataset):
 
         self.file_list = self.create_file_list(file_data_path)
 
-        self.transform = transform
+        self.transformations = Transformations(data_config["transformations"], mode)
 
-        self.transformations = iaa.Noop()
-
-        self.height = data_config["figure_size"]
-        self.width = data_config["figure_size"]
-
-        self.resize_transformation = iaa.Resize(
-            {"height": self.height, "width": self.width}
-        )
+        self.height = data_config["transformations"]["figure_size"]
+        self.width = data_config["transformations"]["figure_size"]
 
         self.data_encoder = data_encoder
         self.default_boxes = self.data_encoder.default_boxes
@@ -56,21 +46,13 @@ class ImageDataset(Dataset):
         # Load annotations for image
         labels = self.load_labels_from_annotation(filename)
 
-        labels = BoundingBoxesOnImage(labels, shape=image.shape)
-
         # Perform transformations on the data
-        if self.transform:
+        transformed_data = self.transformations(image=image, bounding_boxes=labels)
 
-            image, labels = self.transformations(image=image, bounding_boxes=labels)
+        image = transformed_data["image"]
+        labels = transformed_data["bboxes"]
 
-        # Resize data regardless of train or test
-        image, labels = self.resize_transformation(image=image, bounding_boxes=labels)
-
-        labels = labels.bounding_boxes
-
-        labels = torch.Tensor(
-            np.array([np.append(box.coords.flatten(), box.label) for box in labels])
-        )
+        labels = torch.Tensor(labels)
 
         image = torch.Tensor(image)
 
@@ -120,14 +102,12 @@ class ImageDataset(Dataset):
 
             box = obj["bndbox"]
 
-            labels.append(
-                BoundingBox(
-                    x1=box["xmin"],
-                    y1=box["ymin"],
-                    x2=box["xmax"],
-                    y2=box["ymax"],
-                    label=self.classes.index(obj["name"]),
-                )
-            )
+            labels.append([
+                    float(box["xmin"]),
+                    float(box["ymin"]),
+                    float(box["xmax"]),
+                    float(box["ymax"]),
+                    self.classes.index(obj["name"])
+            ])
 
         return labels
