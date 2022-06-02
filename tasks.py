@@ -1,12 +1,13 @@
 from invoke import task
 
+from scripts.train import train_model
 from visualize.visualize_batch import visualize_batch
 
 
 @task
 def train(c, filename="configs/config.yaml"):
 
-    c.run(f"python3 train.py --config {filename}")
+    train_model(filename)
 
 
 @task
