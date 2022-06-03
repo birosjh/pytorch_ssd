@@ -1,5 +1,7 @@
 __pycache__/
 data/
+logs/
+runs/
 visualize/*.jpg
 tests/test_data/JPEGImages
 tests/test_data/Annotations
