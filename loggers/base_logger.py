@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class BaseLogger(ABC):
     """
     A base logger class
@@ -18,4 +19,3 @@ class BaseLogger(ABC):
             epoch (int): Current Epoch
         """
         pass
-

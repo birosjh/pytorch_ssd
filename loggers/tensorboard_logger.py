@@ -1,5 +1,6 @@
-from loggers.base_logger import BaseLogger
 from torch.utils.tensorboard import SummaryWriter
+
+from loggers.base_logger import BaseLogger
 
 
 class TensorboardLogger(BaseLogger):
@@ -23,4 +24,3 @@ class TensorboardLogger(BaseLogger):
         for record_name, record_value in records.items():
 
             self.writer.add_scalar(record_name, record_value, epoch)
-

@@ -3,7 +3,7 @@ from loggers.tensorboard_logger import TensorboardLogger
 from loggers.textfile_logger import TextFileLogger
 
 
-class LogHandler():
+class LogHandler:
     """
     A logger class that contains all logic for creating logs
     By default all values are logged to console
@@ -19,8 +19,6 @@ class LogHandler():
         if logger_list["textfile"]:
             self.loggers.append(TextFileLogger())
 
-
-
     def __call__(self, records: dict, epoch: int) -> None:
         """
         Log records to all initialized loggers
@@ -33,6 +31,3 @@ class LogHandler():
         for logger in self.loggers:
 
             logger.log(records, epoch)
-
-        
-

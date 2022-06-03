@@ -1,21 +1,19 @@
-from loggers.base_logger import BaseLogger
-import pandas as pd
 from pathlib import Path
+
+from loggers.base_logger import BaseLogger
+
 
 class TextFileLogger(BaseLogger):
     """
     A class that handles logging to a text file
     """
 
-    
     def __init__(self):
 
         self.folderpath = Path("logs")
         self.folderpath.mkdir(parents=True, exist_ok=True)
 
-        
         self.filepath = self.folderpath.joinpath("log.txt")
-        
 
     def log(self, records: dict, epoch: int) -> None:
         """
@@ -37,12 +35,11 @@ class TextFileLogger(BaseLogger):
         for record_name, record_value in records.items():
 
             line += f",{record_value}"
-        
+
         line += "\n"
 
         with open(str(self.filepath), "a") as writer:
             writer.write(line)
-        
 
     def create_text_file(self, record_names: list) -> None:
         """
@@ -58,5 +55,3 @@ class TextFileLogger(BaseLogger):
 
         with open(str(self.filepath), "w") as writer:
             writer.write(line)
-
-

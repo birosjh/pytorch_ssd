@@ -1,5 +1,4 @@
 from loggers.base_logger import BaseLogger
-from torch.utils.tensorboard import SummaryWriter
 
 
 class PrintLogger(BaseLogger):
@@ -25,4 +24,3 @@ class PrintLogger(BaseLogger):
         for record_name, record_value in records.items():
 
             print(f"{record_name}: {record_value}")
-

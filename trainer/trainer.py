@@ -10,8 +10,8 @@ import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from models.loss.ssd import SSDLoss
 from loggers.log_handler import LogHandler
+from models.loss.ssd import SSDLoss
 
 
 class Trainer:
@@ -91,9 +91,9 @@ class Trainer:
         return {
             "train_conf_loss": epoch_conf_loss / len(self.train_dataloader),
             "train_loc_loss": epoch_loc_loss / len(self.train_dataloader),
-            "train_total_loss": epoch_loss / len(self.train_dataloader)
+            "train_total_loss": epoch_loss / len(self.train_dataloader),
         }
-        
+
     def validate_one_epoch(self):
         """
         Run the model through one epoch of validation
@@ -122,5 +122,5 @@ class Trainer:
         return {
             "val_conf_loss": epoch_val_conf_loss / len(self.val_dataloader),
             "val_loc_loss": epoch_val_loc_loss / len(self.val_dataloader),
-            "val_total_loss": epoch_val_loss / len(self.val_dataloader)
+            "val_total_loss": epoch_val_loss / len(self.val_dataloader),
         }
