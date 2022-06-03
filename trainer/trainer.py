@@ -11,6 +11,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from models.loss.ssd import SSDLoss
+from loggers.log_handler import LogHandler
 
 
 class Trainer:
@@ -42,6 +43,7 @@ class Trainer:
         self.loss = SSDLoss(alpha=training_config["alpha"])
 
         self.epochs = training_config["epochs"]
+        self.log = LogHandler(training_config["loggers"])
 
     def train(self):
         """
@@ -52,9 +54,13 @@ class Trainer:
             print("Epoch {}/{}".format(epoch, self.epochs - 1))
             print("-" * 10)
 
-            self.train_one_epoch()
+            train_records = self.train_one_epoch()
 
-            self.validate_one_epoch()
+            val_records = self.validate_one_epoch()
+
+            records = {**train_records, **val_records}
+
+            self.log(records, epoch)
 
     def train_one_epoch(self):
         """
@@ -82,14 +88,12 @@ class Trainer:
             loss.backward()
             self.optimizer.step()
 
-        epoch_conf_loss /= len(self.train_dataloader)
-        epoch_loc_loss /= len(self.train_dataloader)
-        epoch_loss /= len(self.train_dataloader)
-
-        print(f"Training Confidence Loss: {epoch_conf_loss}")
-        print(f"Training Localization Loss: {epoch_loc_loss}")
-        print(f"Training Total Loss: {epoch_loss}")
-
+        return {
+            "train_conf_loss": epoch_conf_loss / len(self.train_dataloader),
+            "train_loc_loss": epoch_loc_loss / len(self.train_dataloader),
+            "train_total_loss": epoch_loss / len(self.train_dataloader)
+        }
+        
     def validate_one_epoch(self):
         """
         Run the model through one epoch of validation
@@ -115,10 +119,8 @@ class Trainer:
 
             # TODO: Calculate mAP
 
-        epoch_val_conf_loss /= len(self.val_dataloader)
-        epoch_val_loc_loss /= len(self.val_dataloader)
-        epoch_val_loss /= len(self.val_dataloader)
-
-        print(f"Validation Confidence Loss: {epoch_val_conf_loss}")
-        print(f"Validation Localization Loss: {epoch_val_loc_loss}")
-        print(f"Validation Total Loss: {epoch_val_loss}")
+        return {
+            "val_conf_loss": epoch_val_conf_loss / len(self.val_dataloader),
+            "val_loc_loss": epoch_val_loc_loss / len(self.val_dataloader),
+            "val_total_loss": epoch_val_loss / len(self.val_dataloader)
+        }
