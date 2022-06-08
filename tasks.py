@@ -1,6 +1,7 @@
 from invoke import task
 
 from scripts.train import train_model
+from scripts.inference import inference
 from visualize.visualize_batch import visualize_batch
 
 
@@ -8,6 +9,11 @@ from visualize.visualize_batch import visualize_batch
 def train(c, filename="configs/config.yaml"):
 
     train_model(filename)
+
+@task
+def infer(c, filename="configs/config.yaml", image_filename, output_filename):
+
+    inference(filename, image_filename, output_filename)
 
 
 @task
