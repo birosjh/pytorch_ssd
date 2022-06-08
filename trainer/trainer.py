@@ -6,13 +6,14 @@ Contains a trainer to train an SSD model with the specified dataset.
 
 """
 
+from pathlib import Path
+
 import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from loggers.log_handler import LogHandler
 from models.loss.ssd import SSDLoss
-from pathlib import Path
 
 
 class Trainer:
@@ -70,7 +71,7 @@ class Trainer:
         # Save Model
         last_model_path = self.save_path / "last_model.pth"
         torch.save(self.model.state_dict(), last_model_path)
-        
+
     def train_one_epoch(self) -> dict:
         """
         Run the model through one epoch of training
@@ -157,5 +158,3 @@ class Trainer:
             self.lowest_validation_loss = validation_loss
 
             torch.save(self.model.state_dict(), best_model_path)
-
-

@@ -1,6 +1,7 @@
+from typing import Any
+
 import albumentations as A
 import numpy as np
-from typing import Any
 
 
 class Transformations:

@@ -1,4 +1,3 @@
-from loggers.base_logger import BaseLogger
 from loggers.print_logger import PrintLogger
 from loggers.tensorboard_logger import TensorboardLogger
 from loggers.textfile_logger import TextFileLogger

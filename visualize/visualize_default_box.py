@@ -4,8 +4,9 @@ import random
 import cv2
 import imgaug.augmenters as iaa
 import yaml
-from utils.data_encoder import DataEncoder
 from imgaug.augmentables.bbs import BoundingBox, BoundingBoxesOnImage
+
+from utils.data_encoder import DataEncoder
 
 
 def load_configurations():
