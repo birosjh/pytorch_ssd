@@ -46,6 +46,7 @@ class Trainer:
         self.epochs = training_config["epochs"]
         self.log = LogHandler(training_config["loggers"])
         self.save_path = Path(training_config["model_save_path"])
+        self.save_path.mkdir(parents=True, exist_ok=True)
 
     def train(self):
         """
@@ -59,6 +60,8 @@ class Trainer:
             train_records = self.train_one_epoch()
 
             val_records = self.validate_one_epoch()
+
+            self.save_best_model(epoch, val_records)
 
             records = {**train_records, **val_records}
 
@@ -130,3 +133,29 @@ class Trainer:
             "val_loc_loss": epoch_val_loc_loss / len(self.val_dataloader),
             "val_total_loss": epoch_val_loss / len(self.val_dataloader),
         }
+
+    def save_best_model(self, epoch: int, val_records: dict) -> None:
+        """
+        If the current model has a lower validation loss than the previous
+        epoch's model, then save it as the best model.
+
+        Args:
+            epoch (int): The current epoch
+            val_records (dict): The validation records
+        """
+
+        best_model_path = self.save_path / "best_model.pth"
+
+        validation_loss = val_records["val_total_loss"]
+
+        if epoch == 0:
+
+            self.lowest_validation_loss = validation_loss
+
+        if validation_loss < self.lowest_validation_loss:
+
+            self.lowest_validation_loss = validation_loss
+
+            torch.save(self.model.state_dict(), best_model_path)
+
+
