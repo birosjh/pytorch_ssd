@@ -28,3 +28,7 @@ data_configuration:
     transformations:
         figure_size: 256 # Regardless of transform settings this will be applied
         transform: True
+
+inference_configuration:
+    figure_size: 256
+    model_path: "saved_models/best_model.pth"

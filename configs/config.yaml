@@ -23,9 +23,12 @@ data_configuration:
     val: "./data/val.txt"
     image_directory: "./data/JPEGImages"
     annotation_directory: "./data/Annotations"
-    figure_size: 256
     classes: ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus', 'car', 'cat', 'chair', 'cow', 'diningtable', 'dog', 'horse', 'motorbike', 'person', 'pottedplant', 'sheep', 'sofa', 'train', 'tvmonitor']
 
     transformations:
         figure_size: 256 # Regardless of transform settings this will be applied
         transform: True
+
+inference_configuration:
+    figure_size: 256
+    model_path: "saved_models/best_model.pth"
