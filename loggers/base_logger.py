@@ -7,7 +7,7 @@ class BaseLogger(ABC):
     """
 
     @abstractmethod
-    def __init__(self):
+    def __init__(self) -> None:
 
         pass
 

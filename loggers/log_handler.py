@@ -9,7 +9,7 @@ class LogHandler:
     By default all values are logged to console
     """
 
-    def __init__(self, logger_list: dict):
+    def __init__(self, logger_list: dict) -> None:
 
         self.loggers = [PrintLogger()]
 

@@ -6,7 +6,7 @@ class PrintLogger(BaseLogger):
     A class that handles printing logs to the console
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
 
         pass
 
