@@ -28,6 +28,7 @@ def format(c, filename="."):
     c.run(f"isort {filename}")
     c.run(f"black {filename}")
     c.run(f"flake8 {filename}")
+    c.run(f"mypy {filename}")
 
 
 @task
