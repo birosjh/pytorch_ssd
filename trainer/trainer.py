@@ -12,6 +12,7 @@ from tqdm import tqdm
 
 from loggers.log_handler import LogHandler
 from models.loss.ssd import SSDLoss
+from pathlib import Path
 
 
 class Trainer:
@@ -44,6 +45,7 @@ class Trainer:
 
         self.epochs = training_config["epochs"]
         self.log = LogHandler(training_config["loggers"])
+        self.save_path = Path(training_config["model_save_path"])
 
     def train(self):
         """
@@ -62,6 +64,10 @@ class Trainer:
 
             self.log(records, epoch)
 
+        # Save Model
+        last_model_path = self.save_path / "last_model.pth"
+        torch.save(self.model.state_dict(), last_model_path)
+        
     def train_one_epoch(self):
         """
         Run the model through one epoch of training

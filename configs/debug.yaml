@@ -16,6 +16,7 @@ training_configuration:
     batch_size: 4
     epochs: 50
     num_workers: 0
+    model_save_path: "saved_models"
 
 data_configuration:
     train: "./data/train_sample.txt"
