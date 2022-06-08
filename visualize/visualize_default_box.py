@@ -4,7 +4,7 @@ import random
 import cv2
 import imgaug.augmenters as iaa
 import yaml
-from data_encoder import DataEncoder
+from utils.data_encoder import DataEncoder
 from imgaug.augmentables.bbs import BoundingBox, BoundingBoxesOnImage
 
 

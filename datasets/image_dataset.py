@@ -1,5 +1,6 @@
 import os
 
+from typing import Any
 import cv2
 import numpy as np
 import pandas as pd
@@ -62,22 +63,22 @@ class ImageDataset(Dataset):
         image = transformed_data["image"]
         labels = transformed_data["bboxes"]
 
-        labels = torch.Tensor(labels)
+        label_tensor = torch.Tensor(labels)
 
         image = torch.Tensor(image)
 
-        labels = self.data_encoder.encode(labels)
+        encoded_label_tensor = self.data_encoder.encode(label_tensor)
 
         if self.visualize:
 
-            return (image, labels)
+            return (image, encoded_label_tensor)
 
         # This seems bad, but I will revist it later when I check for bottlenecks
         image = image.permute(2, 0, 1)
 
-        return (image, labels)
+        return (image, encoded_label_tensor)
 
-    def create_file_list(self, file_data_path: str) -> list:
+    def create_file_list(self, file_data_path: str) -> Any:
         """
         Creates a list of files from the specified text file
 

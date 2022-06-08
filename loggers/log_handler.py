@@ -1,3 +1,4 @@
+from loggers.base_logger import BaseLogger
 from loggers.print_logger import PrintLogger
 from loggers.tensorboard_logger import TensorboardLogger
 from loggers.textfile_logger import TextFileLogger
@@ -11,7 +12,7 @@ class LogHandler:
 
     def __init__(self, logger_list: dict) -> None:
 
-        self.loggers = [PrintLogger()]
+        self.loggers: list = [PrintLogger()]
 
         if logger_list["tensorboard"]:
             self.loggers.append(TensorboardLogger())

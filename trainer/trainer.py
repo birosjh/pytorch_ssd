@@ -21,7 +21,7 @@ class Trainer:
     and trains the model according to the training configurations
     """
 
-    def __init__(self, model, train_dataset, val_dataset, training_config):
+    def __init__(self, model, train_dataset, val_dataset, training_config) -> None:
 
         self.model = model
 
@@ -48,7 +48,7 @@ class Trainer:
         self.save_path = Path(training_config["model_save_path"])
         self.save_path.mkdir(parents=True, exist_ok=True)
 
-    def train(self):
+    def train(self) -> None:
         """
         Train the model
         """
@@ -71,7 +71,7 @@ class Trainer:
         last_model_path = self.save_path / "last_model.pth"
         torch.save(self.model.state_dict(), last_model_path)
         
-    def train_one_epoch(self):
+    def train_one_epoch(self) -> dict:
         """
         Run the model through one epoch of training
         """
@@ -103,7 +103,7 @@ class Trainer:
             "train_total_loss": epoch_loss / len(self.train_dataloader),
         }
 
-    def validate_one_epoch(self):
+    def validate_one_epoch(self) -> dict:
         """
         Run the model through one epoch of validation
         """

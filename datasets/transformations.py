@@ -1,5 +1,6 @@
 import albumentations as A
 import numpy as np
+from typing import Any
 
 
 class Transformations:
@@ -8,7 +9,7 @@ class Transformations:
     It returns a transformed image when called
     """
 
-    def __init__(self, config: dict, mode: str):
+    def __init__(self, config: dict, mode: str) -> None:
 
         if config["transform"] and mode == "train":
             self.transform = A.Compose(
@@ -25,7 +26,7 @@ class Transformations:
                 bbox_params=A.BboxParams(format="pascal_voc"),
             )
 
-    def __call__(self, image: np.ndarray, bounding_boxes: list) -> dict:
+    def __call__(self, image: np.ndarray, bounding_boxes: list) -> Any:
         """
         Apply the albumentations transformation and return the transformed image
 
