@@ -6,6 +6,8 @@ Contains a trainer to train an SSD model with the specified dataset.
 
 """
 
+from pathlib import Path
+
 import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
@@ -20,7 +22,7 @@ class Trainer:
     and trains the model according to the training configurations
     """
 
-    def __init__(self, model, train_dataset, val_dataset, training_config):
+    def __init__(self, model, train_dataset, val_dataset, training_config) -> None:
 
         self.model = model
 
@@ -44,8 +46,10 @@ class Trainer:
 
         self.epochs = training_config["epochs"]
         self.log = LogHandler(training_config["loggers"])
+        self.save_path = Path(training_config["model_save_path"])
+        self.save_path.mkdir(parents=True, exist_ok=True)
 
-    def train(self):
+    def train(self) -> None:
         """
         Train the model
         """
@@ -58,11 +62,17 @@ class Trainer:
 
             val_records = self.validate_one_epoch()
 
+            self.save_best_model(epoch, val_records)
+
             records = {**train_records, **val_records}
 
             self.log(records, epoch)
 
-    def train_one_epoch(self):
+        # Save Model
+        last_model_path = self.save_path / "last_model.pth"
+        torch.save(self.model.state_dict(), last_model_path)
+
+    def train_one_epoch(self) -> dict:
         """
         Run the model through one epoch of training
         """
@@ -94,7 +104,7 @@ class Trainer:
             "train_total_loss": epoch_loss / len(self.train_dataloader),
         }
 
-    def validate_one_epoch(self):
+    def validate_one_epoch(self) -> dict:
         """
         Run the model through one epoch of validation
         """
@@ -124,3 +134,27 @@ class Trainer:
             "val_loc_loss": epoch_val_loc_loss / len(self.val_dataloader),
             "val_total_loss": epoch_val_loss / len(self.val_dataloader),
         }
+
+    def save_best_model(self, epoch: int, val_records: dict) -> None:
+        """
+        If the current model has a lower validation loss than the previous
+        epoch's model, then save it as the best model.
+
+        Args:
+            epoch (int): The current epoch
+            val_records (dict): The validation records
+        """
+
+        best_model_path = self.save_path / "best_model.pth"
+
+        validation_loss = val_records["val_total_loss"]
+
+        if epoch == 0:
+
+            self.lowest_validation_loss = validation_loss
+
+        if validation_loss < self.lowest_validation_loss:
+
+            self.lowest_validation_loss = validation_loss
+
+            torch.save(self.model.state_dict(), best_model_path)

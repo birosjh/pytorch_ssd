@@ -5,7 +5,7 @@ from models.loss.localization import LocalizationLoss
 
 
 class SSDLoss(nn.Module):
-    def __init__(self, alpha):
+    def __init__(self, alpha) -> None:
         super(SSDLoss, self).__init__()
 
         self.alpha = alpha
@@ -13,7 +13,7 @@ class SSDLoss(nn.Module):
         self.confidence_loss = nn.CrossEntropyLoss()
         self.localization_loss = LocalizationLoss()
 
-    def forward(self, predictions, targets):
+    def forward(self, predictions: torch.Tensor, targets: torch.Tensor) -> tuple:
 
         pred_confidences, pred_localizations = predictions
         pred_confidences = torch.argmax(pred_confidences, dim=2).type(torch.float32)

@@ -9,9 +9,9 @@ class LogHandler:
     By default all values are logged to console
     """
 
-    def __init__(self, logger_list: dict):
+    def __init__(self, logger_list: dict) -> None:
 
-        self.loggers = [PrintLogger()]
+        self.loggers: list = [PrintLogger()]
 
         if logger_list["tensorboard"]:
             self.loggers.append(TensorboardLogger())

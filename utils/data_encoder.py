@@ -17,7 +17,7 @@ class DataEncoder:
 
         self.default_boxes = self.create_default_boxes(default_box_config)
 
-    def create_default_boxes(self, default_box_config: dict) -> list:
+    def create_default_boxes(self, default_box_config: dict) -> torch.Tensor:
 
         figure_size = default_box_config["figure_size"]
         feature_map_sizes = default_box_config["feature_map_sizes"]
@@ -66,9 +66,11 @@ class DataEncoder:
         dboxes_ltrb[:, 2] = dboxes[:, 0] + 0.5 * dboxes[:, 2]
         dboxes_ltrb[:, 3] = dboxes[:, 1] + 0.5 * dboxes[:, 3]
 
-        return dboxes_ltrb * figure_size
+        dboxes_ltrb = dboxes_ltrb * figure_size
 
-    def encode(self, boxes_and_labels, criteria=0.5):
+        return dboxes_ltrb
+
+    def encode(self, boxes_and_labels, criteria: float = 0.5) -> torch.Tensor:
 
         bounding_boxes = boxes_and_labels[:, 0:4]
         labels_in = boxes_and_labels[:, 4]
@@ -108,7 +110,7 @@ class DataEncoder:
 
         return encoded_boxes_and_labels
 
-    def calculate_iou(self, box1, box2):
+    def calculate_iou(self, box1: torch.Tensor, box2: torch.Tensor) -> torch.Tensor:
 
         N = box1.size(0)
         M = box2.size(0)

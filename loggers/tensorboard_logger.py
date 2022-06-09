@@ -8,7 +8,7 @@ class TensorboardLogger(BaseLogger):
     A class that handles recording logs to tensorboard
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
 
         self.writer = SummaryWriter()
 

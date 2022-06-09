@@ -14,8 +14,9 @@ training_configuration:
     learning_rate: 0.001
     alpha: 0.9
     batch_size: 4
-    epochs: 50
+    epochs: 5
     num_workers: 0
+    model_save_path: "saved_models"
 
 data_configuration:
     train: "./data/train_sample.txt"
@@ -27,3 +28,6 @@ data_configuration:
     transformations:
         figure_size: 256 # Regardless of transform settings this will be applied
         transform: True
+
+inference_configuration:
+    model_path: "saved_models/best_model.pth"
