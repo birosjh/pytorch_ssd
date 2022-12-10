@@ -14,11 +14,11 @@ from utils.default_box import number_of_default_boxes_per_cell
 
 
 class SSD(nn.Module):
-    def __init__(self, config: dict, num_classes: int) -> None:
+    def __init__(self, config: dict, num_classes: int, device: str) -> None:
         # Always have to do this when making a new model
         super(SSD, self).__init__()
 
-        self.feature_map_extractor = backbone_loader(config)
+        self.feature_map_extractor = backbone_loader(config).to(device)
         self.num_classes = num_classes
 
         self.loc_layers = []
@@ -32,15 +32,17 @@ class SSD(nn.Module):
 
         for num_anchors, output_channels in zip(num_defaults_per_cell, output_channels):
 
-            self.loc_layers += self.bbox_predictor(output_channels, num_anchors)
+            self.loc_layers += self.bbox_predictor(output_channels, num_anchors, device)
             self.conf_layers += self.class_predictor(
-                output_channels, num_anchors, num_classes
+                output_channels, num_anchors, num_classes, device
             )
 
     def forward(self, x):
         feature_maps = []
         loc = []
         conf = []
+
+        print(len(self.feature_map_extractor.model))
 
         # Collect feature_maps
         for section in self.feature_map_extractor.model:
@@ -64,12 +66,18 @@ class SSD(nn.Module):
 
         return (conf, loc)
 
-    def class_predictor(self, out_channels, num_anchors, num_classes):
+    def class_predictor(self, out_channels, num_anchors, num_classes, device):
 
         return [
-            nn.Conv2d(out_channels, num_anchors * num_classes, kernel_size=3, padding=1)
+            nn.Conv2d(
+                out_channels, num_anchors * num_classes, kernel_size=3, padding=1
+            ).to(device)
         ]
 
-    def bbox_predictor(self, out_channels, num_anchors):
+    def bbox_predictor(self, out_channels, num_anchors, device):
 
-        return [nn.Conv2d(out_channels, num_anchors * 4, kernel_size=3, padding=1)]
+        return [
+            nn.Conv2d(out_channels, num_anchors * 4, kernel_size=3, padding=1).to(
+                device
+            )
+        ]

@@ -11,6 +11,8 @@ from math import sqrt
 import numpy as np
 import torch
 
+from utils.iou import intersection_over_union
+
 
 class DataEncoder:
     def __init__(self, default_box_config):
@@ -78,7 +80,7 @@ class DataEncoder:
         num_default_boxes = self.default_boxes.size(0)
 
         # Returns a matrix of ious for each bbox and each dbox
-        ious = self.calculate_iou(bounding_boxes, self.default_boxes)
+        ious = intersection_over_union(bounding_boxes, self.default_boxes)
 
         # Get the values and indices of the best bbox ious for dboxes
         best_dbox_ious, best_dbox_idx = ious.max(0)
@@ -109,40 +111,3 @@ class DataEncoder:
         )
 
         return encoded_boxes_and_labels
-
-    def calculate_iou(self, box1: torch.Tensor, box2: torch.Tensor) -> torch.Tensor:
-
-        N = box1.size(0)
-        M = box2.size(0)
-
-        left_top = torch.max(
-            # [N,2] -> [N,1,2] -> [N,M,2]
-            box1[:, :2].unsqueeze(1).expand(N, M, 2),
-            # [M,2] -> [1,M,2] -> [N,M,2]
-            box2[:, :2].unsqueeze(0).expand(N, M, 2),
-        )
-
-        right_bottom = torch.min(
-            # [N,2] -> [N,1,2] -> [N,M,2]
-            box1[:, 2:].unsqueeze(1).expand(N, M, 2),
-            # [M,2] -> [1,M,2] -> [N,M,2]
-            box2[:, 2:].unsqueeze(0).expand(N, M, 2),
-        )
-
-        width_height = right_bottom - left_top  # [N,M,2]
-        width_height[width_height < 0] = 0  # clip at 0
-
-        # Area of the intersection of the two boxes
-        intersection = width_height[:, :, 0] * width_height[:, :, 1]  # [N,M]
-
-        # Areas of each box
-        area1 = (box1[:, 2] - box1[:, 0]) * (box1[:, 3] - box1[:, 1])  # [N,]
-        area2 = (box2[:, 2] - box2[:, 0]) * (box2[:, 3] - box2[:, 1])  # [M,]
-
-        area1 = area1.unsqueeze(1).expand_as(intersection)  # [N,] -> [N,1] -> [N,M]
-        area2 = area2.unsqueeze(0).expand_as(intersection)  # [M,] -> [1,M] -> [N,M]
-
-        # Union is the combined area of the two boxes without counting overlap twice
-        union = area1 + area2 - intersection
-
-        return intersection / union

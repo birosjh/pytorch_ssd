@@ -23,6 +23,7 @@ class ImageDataset(Dataset):
         data_encoder: DataEncoder,
         mode: str = "train",
         visualize: bool = False,
+        device: str = "cpu",
     ):
 
         self.visualize = visualize
@@ -42,6 +43,8 @@ class ImageDataset(Dataset):
 
         self.data_encoder = data_encoder
         self.default_boxes = self.data_encoder.default_boxes
+
+        self.device = device
 
     def __len__(self):
         return len(self.file_list)
@@ -67,14 +70,14 @@ class ImageDataset(Dataset):
 
         image = torch.Tensor(image)
 
-        encoded_label_tensor = self.data_encoder.encode(label_tensor)
+        encoded_label_tensor = self.data_encoder.encode(label_tensor).to(self.device)
 
         if self.visualize:
 
             return (image, encoded_label_tensor)
 
         # This seems bad, but I will revist it later when I check for bottlenecks
-        image = image.permute(2, 0, 1)
+        image = image.permute(2, 0, 1).to(self.device)
 
         return (image, encoded_label_tensor)
 

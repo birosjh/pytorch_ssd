@@ -19,7 +19,13 @@ def train_model(config_path: str) -> None:
         config = yaml.safe_load(file)
 
     # Use GPU if available
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    try:
+
+        device = "mps" if torch.backends.mps.is_available() else "cpu"
+    except AttributeError:
+
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+
     print("Using {} device".format(device))
 
     model_config = config["model_configuration"]
@@ -29,9 +35,7 @@ def train_model(config_path: str) -> None:
     data_encoder = DataEncoder(model_config)
 
     train_dataset = ImageDataset(
-        data_config=data_config,
-        data_encoder=data_encoder,
-        mode="train",
+        data_config=data_config, data_encoder=data_encoder, mode="train", device=device
     )
 
     val_dataset = ImageDataset(
@@ -40,7 +44,7 @@ def train_model(config_path: str) -> None:
 
     num_classes = len(data_config["classes"]) + 1
 
-    model = SSD(model_config, num_classes).to(device)
+    model = SSD(model_config, num_classes, device)
 
-    trainer = Trainer(model, train_dataset, val_dataset, training_config)
+    trainer = Trainer(model, train_dataset, val_dataset, training_config, device)
     trainer.train()
