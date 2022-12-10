@@ -1,11 +1,17 @@
 import torch
 
 
-def intersection_over_union(first_boxes: torch.Tensor, second_boxes: torch.Tensor) -> torch.Tensor:
+def intersection_over_union(
+    first_boxes: torch.Tensor, second_boxes: torch.Tensor
+) -> torch.Tensor:
 
-    first_area = (first_boxes[:, 2] - first_boxes[:, 0]) * (first_boxes[:, 3] - first_boxes[:, 1])
+    first_area = (first_boxes[:, 2] - first_boxes[:, 0]) * (
+        first_boxes[:, 3] - first_boxes[:, 1]
+    )
 
-    second_area = (second_boxes[: ,2] - second_boxes[:, 0]) * (second_boxes[:, 3] - second_boxes[: ,1])
+    second_area = (second_boxes[:, 2] - second_boxes[:, 0]) * (
+        second_boxes[:, 3] - second_boxes[:, 1]
+    )
 
     # Create a grid of max and min for each box dimension
     left = torch.max(first_boxes[:, 0].unsqueeze(dim=1), second_boxes[:, 0])

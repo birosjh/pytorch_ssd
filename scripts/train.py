@@ -35,10 +35,7 @@ def train_model(config_path: str) -> None:
     data_encoder = DataEncoder(model_config)
 
     train_dataset = ImageDataset(
-        data_config=data_config,
-        data_encoder=data_encoder,
-        mode="train",
-        device=device
+        data_config=data_config, data_encoder=data_encoder, mode="train", device=device
     )
 
     val_dataset = ImageDataset(

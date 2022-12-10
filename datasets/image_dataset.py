@@ -23,7 +23,7 @@ class ImageDataset(Dataset):
         data_encoder: DataEncoder,
         mode: str = "train",
         visualize: bool = False,
-        device: str = "cpu"
+        device: str = "cpu",
     ):
 
         self.visualize = visualize

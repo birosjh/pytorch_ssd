@@ -23,7 +23,9 @@ class Trainer:
     and trains the model according to the training configurations
     """
 
-    def __init__(self, model, train_dataset, val_dataset, training_config, device) -> None:
+    def __init__(
+        self, model, train_dataset, val_dataset, training_config, device
+    ) -> None:
 
         self.model = model
 
@@ -100,7 +102,7 @@ class Trainer:
                     confidence,
                     localizations[idx],
                     self.iou_threshold,
-                    device=self.device
+                    device=self.device,
                 )
 
                 maximum_confidences.append(max_confidence)

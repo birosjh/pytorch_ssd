@@ -6,8 +6,10 @@ from torch.utils.data import DataLoader
 
 from datasets.image_dataset import ImageDataset
 from utils.data_encoder import DataEncoder
-from utils.default_box import (number_of_default_boxes_per_cell,
-                               total_number_of_default_boxes)
+from utils.default_box import (
+    number_of_default_boxes_per_cell,
+    total_number_of_default_boxes,
+)
 
 
 class TestDataloader(unittest.TestCase):

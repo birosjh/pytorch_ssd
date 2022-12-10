@@ -2,6 +2,7 @@ import torch
 
 from utils.iou import intersection_over_union
 
+
 def non_maximum_supression(confidences, boxes, threshold, device):
 
     iou_grid = intersection_over_union(boxes, boxes)
@@ -29,5 +30,4 @@ def non_maximum_supression(confidences, boxes, threshold, device):
         # Remove overlapping
         confidence_indices = confidence_indices[iou < threshold]
 
-    
     return (confidences[maximum_indices], boxes[maximum_indices])
