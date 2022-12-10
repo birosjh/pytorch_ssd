@@ -11,7 +11,7 @@ from math import sqrt
 import numpy as np
 import torch
 
-from utils.iou import calculate_iou
+from utils.iou import intersection_over_union
 
 
 class DataEncoder:
@@ -80,7 +80,7 @@ class DataEncoder:
         num_default_boxes = self.default_boxes.size(0)
 
         # Returns a matrix of ious for each bbox and each dbox
-        ious = calculate_iou(bounding_boxes, self.default_boxes)
+        ious = intersection_over_union(bounding_boxes, self.default_boxes)
 
         # Get the values and indices of the best bbox ious for dboxes
         best_dbox_ious, best_dbox_idx = ious.max(0)
