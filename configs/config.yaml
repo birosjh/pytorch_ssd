@@ -17,6 +17,7 @@ training_configuration:
     epochs: 50
     num_workers: 0
     model_save_path: "saved_models"
+    iou_threshold: 0.5
 
 data_configuration:
     train: "./data/train.txt"
