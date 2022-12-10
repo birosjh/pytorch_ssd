@@ -1,39 +1,29 @@
 import torch
 
 
-def calculate_iou(box1: torch.Tensor, box2: torch.Tensor) -> torch.Tensor:
+def intersection_over_union(first_boxes: torch.Tensor, second_boxes: torch.Tensor) -> torch.Tensor:
 
-    N = box1.size(0)
-    M = box2.size(0)
+    first_area = (first_boxes[:, 2] - first_boxes[:, 0]) * (first_boxes[:, 3] - first_boxes[:, 1])
 
-    left_top = torch.max(
-        # [N,2] -> [N,1,2] -> [N,M,2]
-        box1[:, :2].unsqueeze(1).expand(N, M, 2),
-        # [M,2] -> [1,M,2] -> [N,M,2]
-        box2[:, :2].unsqueeze(0).expand(N, M, 2),
-    )
+    second_area = (second_boxes[: ,2] - second_boxes[:, 0]) * (second_boxes[:, 3] - second_boxes[: ,1])
 
-    right_bottom = torch.min(
-        # [N,2] -> [N,1,2] -> [N,M,2]
-        box1[:, 2:].unsqueeze(1).expand(N, M, 2),
-        # [M,2] -> [1,M,2] -> [N,M,2]
-        box2[:, 2:].unsqueeze(0).expand(N, M, 2),
-    )
+    # Create a grid of max and min for each box dimension
+    left = torch.max(first_boxes[:, 0].unsqueeze(dim=1), second_boxes[:, 0])
+    top = torch.max(first_boxes[:, 1].unsqueeze(dim=1), second_boxes[:, 1])
+    right = torch.min(first_boxes[:, 2].unsqueeze(dim=1), second_boxes[:, 2])
+    bottom = torch.min(first_boxes[:, 3].unsqueeze(dim=1), second_boxes[:, 3])
 
-    width_height = right_bottom - left_top  # [N,M,2]
-    width_height[width_height < 0] = 0  # clip at 0
+    # Subtract right to left to get x_diff
+    x_diff = right - left
+    x_diff[x_diff < 0] = 0
 
-    # Area of the intersection of the two boxes
-    intersection = width_height[:, :, 0] * width_height[:, :, 1]  # [N,M]
+    # Subtract bottom to top to get y_diff
+    y_diff = bottom - top
+    y_diff[y_diff < 0] = 0
 
-    # Areas of each box
-    area1 = (box1[:, 2] - box1[:, 0]) * (box1[:, 3] - box1[:, 1])  # [N,]
-    area2 = (box2[:, 2] - box2[:, 0]) * (box2[:, 3] - box2[:, 1])  # [M,]
-
-    area1 = area1.unsqueeze(1).expand_as(intersection)  # [N,] -> [N,1] -> [N,M]
-    area2 = area2.unsqueeze(0).expand_as(intersection)  # [M,] -> [1,M] -> [N,M]
+    intersecting_area = x_diff * y_diff
 
     # Union is the combined area of the two boxes without counting overlap twice
-    union = area1 + area2 - intersection
+    union = first_area + second_area - intersecting_area
 
-    return intersection / union
+    return intersecting_area / union
