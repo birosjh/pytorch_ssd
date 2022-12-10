@@ -14,6 +14,7 @@ from tqdm import tqdm
 
 from loggers.log_handler import LogHandler
 from models.loss.ssd import SSDLoss
+from utils.nms import non_maximum_supression
 
 
 class Trainer:
@@ -22,7 +23,7 @@ class Trainer:
     and trains the model according to the training configurations
     """
 
-    def __init__(self, model, train_dataset, val_dataset, training_config) -> None:
+    def __init__(self, model, train_dataset, val_dataset, training_config, device) -> None:
 
         self.model = model
 
@@ -48,6 +49,10 @@ class Trainer:
         self.log = LogHandler(training_config["loggers"])
         self.save_path = Path(training_config["model_save_path"])
         self.save_path.mkdir(parents=True, exist_ok=True)
+
+        self.iou_threshold = training_config["iou_threshold"]
+
+        self.device = device
 
     def train(self) -> None:
         """
@@ -85,7 +90,23 @@ class Trainer:
 
         for images, targets in tqdm(self.train_dataloader):
             # Compute prediction and loss
-            predictions = self.model(images)
+            confidences, localizations = self.model(images)
+
+            maximum_confidences = []
+            maximum_localizations = []
+            for idx, confidence in enumerate(confidences):
+
+                max_confidence, max_localization = non_maximum_supression(
+                    confidence,
+                    localizations[idx],
+                    self.iou_threshold,
+                    device=self.device
+                )
+
+                maximum_confidences.append(max_confidence)
+                maximum_localizations.append(max_localization)
+
+            predictions = (maximum_confidences, maximum_localizations)
 
             conf_loss, loc_loss, loss = self.loss(predictions, targets)
 
@@ -120,6 +141,8 @@ class Trainer:
             for images, targets in tqdm(self.val_dataloader):
 
                 predictions = self.model(images)
+
+                predictions = non_maximum_supression(predictions, self.iou_threshold)
 
                 conf_loss, loc_loss, loss = self.loss(predictions, targets)
 
