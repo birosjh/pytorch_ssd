@@ -24,6 +24,6 @@ def intersection_over_union(first_boxes: torch.Tensor, second_boxes: torch.Tenso
     intersecting_area = x_diff * y_diff
 
     # Union is the combined area of the two boxes without counting overlap twice
-    union = first_area + second_area - intersecting_area
+    union = first_area.unsqueeze(dim=1) + second_area - intersecting_area
 
     return intersecting_area / union
