@@ -22,7 +22,7 @@ def train_model(config_path: str) -> None:
     try:
 
         device = "mps" if torch.backends.mps.is_available() else "cpu"
-    except:
+    except AttributeError:
 
         device = "cuda" if torch.cuda.is_available() else "cpu"
 
