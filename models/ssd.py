@@ -32,17 +32,21 @@ class SSD(nn.Module):
 
         for num_anchors, output_channels in zip(num_defaults_per_cell, output_channels):
 
-            self.loc_layers += self.bbox_predictor(output_channels, num_anchors, device)
-            self.conf_layers += self.class_predictor(
-                output_channels, num_anchors, num_classes, device
+            self.loc_layers.append(
+                self.bbox_predictor(
+                    output_channels, num_anchors, device
+                ).to(device)
+            )
+            self.conf_layers.append(
+                self.class_predictor(
+                    output_channels, num_anchors, num_classes, device
+                ).to(device)
             )
 
     def forward(self, x):
         feature_maps = []
         loc = []
         conf = []
-
-        print(len(self.feature_map_extractor.model))
 
         # Collect feature_maps
         for section in self.feature_map_extractor.model:
@@ -68,16 +72,12 @@ class SSD(nn.Module):
 
     def class_predictor(self, out_channels, num_anchors, num_classes, device):
 
-        return [
-            nn.Conv2d(
+        return nn.Conv2d(
                 out_channels, num_anchors * num_classes, kernel_size=3, padding=1
-            ).to(device)
-        ]
+        )
 
     def bbox_predictor(self, out_channels, num_anchors, device):
 
-        return [
-            nn.Conv2d(out_channels, num_anchors * 4, kernel_size=3, padding=1).to(
-                device
-            )
-        ]
+        return nn.Conv2d(
+            out_channels, num_anchors * 4, kernel_size=3, padding=1
+        )
