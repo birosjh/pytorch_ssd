@@ -70,16 +70,14 @@ class ImageDataset(Dataset):
 
         image = torch.Tensor(image)
 
-        encoded_label_tensor = self.data_encoder.encode(label_tensor).to(self.device)
-
         if self.visualize:
 
-            return (image, encoded_label_tensor)
+            return (image, label_tensor)
 
         # This seems bad, but I will revist it later when I check for bottlenecks
         image = image.permute(2, 0, 1).to(self.device)
 
-        return (image, encoded_label_tensor)
+        return (image, label_tensor)
 
     def create_file_list(self, file_data_path: str) -> Any:
         """

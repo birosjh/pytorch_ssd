@@ -91,6 +91,7 @@ class Trainer:
         self.model.train()
 
         for images, targets in tqdm(self.train_dataloader):
+
             # Compute prediction and loss
             confidences, localizations = self.model(images)
 
@@ -108,9 +109,15 @@ class Trainer:
                 maximum_confidences.append(max_confidence)
                 maximum_localizations.append(max_localization)
 
-            predictions = (maximum_confidences, maximum_localizations)
+            encoded_targets = self.data_encoder.encode(localizations).to(self.device)
+            encoded_localizations = self.data_encoder.encode(maximum_localizations).to(self.device)
 
-            conf_loss, loc_loss, loss = self.loss(predictions, targets)
+            predictions = (maximum_confidences, encoded_localizations)
+
+            conf_loss, loc_loss, loss = self.loss(
+                predictions,
+                encoded_targets
+            )
 
             epoch_conf_loss += conf_loss
             epoch_loc_loss += loc_loss
