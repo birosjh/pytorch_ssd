@@ -15,7 +15,7 @@ def non_maximum_supression(confidences, boxes, threshold, device):
     # Create a list of indices for each box
     confidence_indices = torch.arange(len(highest_confidence)).to(device)
 
-    while len(confidence_indices) > 0:
+    while len(confidence_indices) > 0 and len(maximum_indices) < len(confidence_indices):
 
         # Select highest confidence value in list
         index_of_max = highest_confidence[confidence_indices].argmax()
