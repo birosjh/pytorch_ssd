@@ -53,7 +53,6 @@ class Trainer:
         self.save_path.mkdir(parents=True, exist_ok=True)
 
         self.iou_threshold = training_config["iou_threshold"]
-
         self.device = device
 
     def train(self) -> None:
@@ -95,28 +94,12 @@ class Trainer:
             # Compute prediction and loss
             confidences, localizations = self.model(images)
 
-            maximum_confidences = []
-            maximum_localizations = []
-            for idx, confidence in enumerate(confidences):
-
-                max_confidence, max_localization = non_maximum_supression(
-                    confidence,
-                    localizations[idx],
-                    self.iou_threshold,
-                    device=self.device,
-                )
-
-                maximum_confidences.append(max_confidence)
-                maximum_localizations.append(max_localization)
-
-            encoded_targets = self.data_encoder.encode(localizations).to(self.device)
-            encoded_localizations = self.data_encoder.encode(maximum_localizations).to(self.device)
-
-            predictions = (maximum_confidences, encoded_localizations)
+            confidences, localizations = non_maximum_supression(confidences, localizations, self.iou_threshold, self.device)
 
             conf_loss, loc_loss, loss = self.loss(
-                predictions,
-                encoded_targets
+                confidences,
+                localizations,
+                targets
             )
 
             epoch_conf_loss += conf_loss
@@ -149,11 +132,11 @@ class Trainer:
 
             for images, targets in tqdm(self.val_dataloader):
 
-                predictions = self.model(images)
+                confidences, localizations = self.model(images)
 
-                predictions = non_maximum_supression(predictions, self.iou_threshold)
+                confidences, localizations = non_maximum_supression(confidences, localizations, self.iou_threshold, self.device)
 
-                conf_loss, loc_loss, loss = self.loss(predictions, targets)
+                conf_loss, loc_loss, loss = self.loss(confidences, localizations, targets)
 
                 epoch_val_conf_loss += conf_loss
                 epoch_val_loc_loss += loc_loss

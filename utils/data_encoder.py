@@ -72,10 +72,7 @@ class DataEncoder:
 
         return dboxes_ltrb
 
-    def encode(self, boxes_and_labels, criteria: float = 0.5) -> torch.Tensor:
-
-        bounding_boxes = boxes_and_labels[:, 0:4]
-        labels_in = boxes_and_labels[:, 4]
+    def encode(self, bounding_boxes, labels_in, criteria: float = 0.5) -> torch.Tensor:
 
         num_default_boxes = self.default_boxes.size(0)
 
@@ -92,7 +89,7 @@ class DataEncoder:
         best_dbox_ious.index_fill_(0, best_bbox_idx, 2.0)
 
         idx = torch.arange(0, best_bbox_idx.size(0), dtype=torch.int64)
-        best_dbox_idx[best_bbox_idx[idx]] = idx
+        best_dbox_idx[best_bbox_idx] = idx
 
         # filter IoU > 0.5
         passes_criteria = best_dbox_ious > criteria
@@ -105,9 +102,4 @@ class DataEncoder:
             best_dbox_idx[passes_criteria], :
         ]
 
-        # Rejoin the encoded boxes and labels
-        encoded_boxes_and_labels = torch.cat(
-            (encoded_boxes, labels_out.unsqueeze(1)), 1
-        )
-
-        return encoded_boxes_and_labels
+        return encoded_boxes, labels_out

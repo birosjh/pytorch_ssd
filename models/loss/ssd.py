@@ -13,9 +13,8 @@ class SSDLoss(nn.Module):
         self.confidence_loss = nn.CrossEntropyLoss()
         self.localization_loss = LocalizationLoss()
 
-    def forward(self, predictions: torch.Tensor, targets: torch.Tensor) -> tuple:
+    def forward(self, pred_confidences: torch.Tensor, pred_localizations: torch.Tensor, targets: torch.Tensor) -> tuple:
 
-        pred_confidences, pred_localizations = predictions
         pred_confidences = torch.argmax(pred_confidences, dim=2).type(torch.float32)
 
         target_confidences = targets[:, :, -1]

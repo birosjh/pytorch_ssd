@@ -3,31 +3,43 @@ import torch
 from utils.iou import intersection_over_union
 
 
-def non_maximum_supression(confidences, boxes, threshold, device):
+def non_maximum_supression(confidences, localizations, iou_threshold, device):
 
-    iou_grid = intersection_over_union(boxes, boxes)
+    for idx in range(len(confidences)):
 
-    maximum_indices = []
+        boxes = localizations[idx]
+        confs = confidences[idx]
 
-    # Get higest confidence value for each box
-    highest_confidence = confidences.max(dim=1).values
+        iou_grid = intersection_over_union(boxes, boxes)
 
-    # Create a list of indices for each box
-    confidence_indices = torch.arange(len(highest_confidence)).to(device)
+        maximum_indices = []
 
-    while len(confidence_indices) > 0 and len(maximum_indices) < len(confidence_indices):
+        # Get higest confidence value for each box
+        highest_confidence = confs.max(dim=1).values
 
-        # Select highest confidence value in list
-        index_of_max = highest_confidence[confidence_indices].argmax()
-        maximum_indices.append(index_of_max)
+        # Create a list of indices for each box
+        confidence_indices = torch.arange(len(highest_confidence)).to(device)
 
-        # Remove max from remaining indices
-        confidence_indices = confidence_indices[confidence_indices != index_of_max]
+        while len(confidence_indices) > 0 and len(maximum_indices) < len(confidence_indices):
 
-        # Get max iou values
-        iou = iou_grid[index_of_max][confidence_indices]
+            # Select highest confidence value in list
+            index_of_max = highest_confidence[confidence_indices].argmax()
+            maximum_indices.append(index_of_max.item())
 
-        # Remove overlapping
-        confidence_indices = confidence_indices[iou < threshold]
+            # Remove max from remaining indices
+            confidence_indices = confidence_indices[confidence_indices != index_of_max]
 
-    return (confidences[maximum_indices], boxes[maximum_indices])
+            # Get max iou values
+            iou = iou_grid[index_of_max][confidence_indices]
+
+            # Remove overlapping
+            confidence_indices = confidence_indices[iou < iou_threshold]
+
+        maximum_indices = list(set(maximum_indices))
+
+        min_localizations = torch.ones(localizations.shape[1], dtype=bool)
+        min_localizations[maximum_indices] = False
+
+        localizations[idx][min_localizations] = 0
+
+    return confidences, localizations

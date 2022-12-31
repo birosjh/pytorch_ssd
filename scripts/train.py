@@ -44,7 +44,7 @@ def train_model(config_path: str) -> None:
 
     num_classes = len(data_config["classes"]) + 1
 
-    model = SSD(model_config, num_classes, device)
+    model = SSD(model_config, num_classes, data_encoder, device)
 
     trainer = Trainer(model, train_dataset, val_dataset, training_config, device)
     trainer.train()
