@@ -14,9 +14,11 @@ training_configuration:
     learning_rate: 0.001
     alpha: 0.9
     batch_size: 4
-    epochs: 5
+    epochs: 50
     num_workers: 0
     model_save_path: "saved_models"
+    iou_threshold: 0.5
+    map_frequency: 5 # How often to run map calculation
 
 data_configuration:
     train: "./data/train_sample.txt"
