@@ -20,11 +20,13 @@ def non_maximum_supression(confidences, localizations, iou_threshold, device):
         # Create a list of indices for each box
         confidence_indices = torch.arange(len(highest_confidence)).to(device)
 
+        print("hi")
+
         while len(confidence_indices) > 0 and len(maximum_indices) < len(confidence_indices):
 
             # Select highest confidence value in list
-            index_of_max = highest_confidence[confidence_indices].argmax()
-            maximum_indices.append(index_of_max.item())
+            index_of_max = torch.max(highest_confidence[confidence_indices], 0).indices # Argmax in mps has a bug
+            maximum_indices.append(index_of_max)
 
             # Remove max from remaining indices
             confidence_indices = confidence_indices[confidence_indices != index_of_max]
