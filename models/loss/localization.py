@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 
 
@@ -17,6 +18,6 @@ class LocalizationLoss(nn.Module):
         # examples are predicted correctly
         if len(predictions) == 0:
 
-            return 0
+            return torch.tensor(0)
 
         return self.smooth_l1(predictions, targets)
