@@ -98,7 +98,7 @@ class Trainer:
             # Compute prediction and loss
             confidences, localizations = self.model(images)
 
-            confidences, localizations = non_maximum_supression(confidences, localizations, self.iou_threshold, self.device)
+            localizations = non_maximum_supression(confidences, localizations, self.iou_threshold, self.device)
 
             conf_loss, loc_loss, loss = self.loss(
                 confidences,
