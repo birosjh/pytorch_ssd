@@ -8,16 +8,28 @@ model_configuration:
     aspect_ratios: [[2], [2,3], [2,3], [2,3], [2], [2]]
 
 training_configuration:
+    loggers: # Printing is on by default
+        tensorboard: True
+        textfile: True
     learning_rate: 0.001
     alpha: 0.9
     batch_size: 4
     epochs: 50
     num_workers: 0
+    model_save_path: "saved_models"
+    iou_threshold: 0.5
+    map_frequency: 5 # How often to run map calculation
 
 data_configuration:
     train: "tests/test_data/test_data.txt"
     val: "tests/test_data/test_data.txt"
     image_directory: "tests/test_data/JPEGImages"
     annotation_directory: "tests/test_data/Annotations"
-    figure_size: 256
     classes: ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus', 'car', 'cat', 'chair', 'cow', 'diningtable', 'dog', 'horse', 'motorbike', 'person', 'pottedplant', 'sheep', 'sofa', 'train', 'tvmonitor']
+
+    transformations:
+        figure_size: 256 # Regardless of transform settings this will be applied
+        transform: True
+
+inference_configuration:
+    model_path: "saved_models/best_model.pth"
