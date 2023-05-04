@@ -9,7 +9,7 @@ class Vgg16(Module):
 
         super(Vgg16, self).__init__()
 
-        vgg16 = models.vgg16(pretrained=config["pretrained"])
+        vgg16 = models.vgg16(weights="IMAGENET1K_V1")
 
         self.model = Sequential(
             Sequential(*vgg16.features[0:17]),
