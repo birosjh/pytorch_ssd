@@ -31,8 +31,6 @@ class TestIou(unittest.TestCase):
 
         ious = intersection_over_union(box1, box2)
 
-        print(ious)
-
         # Compares each value, then gives a single boolean for whether they all match or not # noqa: E501
         # One box exists in both box1 and box2 so its value is 1
         # One set of boxes don't overlap at all so they come out to zero
@@ -49,3 +47,23 @@ class TestIou(unittest.TestCase):
         )
 
         self.assertTrue(equivalence_check.numpy())
+
+    def test_sandbox(self):
+
+        boxes = torch.tensor([
+            [20.0, 30.0, 35.0, 40.0],
+            [25.0, 25.0, 40.0, 35.0],
+            [25.0, 25.0, 45.0, 35.0],
+            [100.0, 100.0, 120.0, 120.0],
+            [35.0, 30.0, 55.0, 40.0],
+        ])
+
+        ious = intersection_over_union(boxes, boxes)
+
+        print(ious)
+
+        print(ious.max(dim=0))
+        print(ious.sum(dim=0))
+
+        print(~torch.isclose(ious.sum(dim=0), ious.max(dim=0).values))
+        print((~torch.isclose(ious.sum(dim=0), ious.max(dim=0).values)).nonzero(as_tuple=True)[0])
