@@ -13,4 +13,10 @@ class LocalizationLoss(nn.Module):
 
     def forward(self, predictions, targets):
 
+        # As specified in the SSD paper, set to zero when no
+        # examples are predicted correctly
+        if len(predictions) == 0:
+
+            return 0
+
         return self.smooth_l1(predictions, targets)
