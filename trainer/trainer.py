@@ -9,12 +9,14 @@ Contains a trainer to train an SSD model with the specified dataset.
 from pathlib import Path
 
 import torch
+import numpy as np
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from loggers.log_handler import LogHandler
 from models.loss.ssd import SSDLoss
 from utils.nms import non_maximum_supression
+from models.metrics.map import mean_average_precision
 
 
 class Trainer:
@@ -27,7 +29,7 @@ class Trainer:
         self, model, train_dataset, val_dataset, training_config, device
     ) -> None:
 
-        self.model = model
+        self.model = model.to(device)
 
         self.train_dataloader = DataLoader(
             train_dataset,
@@ -51,6 +53,8 @@ class Trainer:
         self.log = LogHandler(training_config["loggers"])
         self.save_path = Path(training_config["model_save_path"])
         self.save_path.mkdir(parents=True, exist_ok=True)
+
+        self.label_indices = np.arange(1, len(train_dataset.classes) + 1)
 
         self.iou_threshold = training_config["iou_threshold"]
         self.device = device
@@ -102,9 +106,9 @@ class Trainer:
                 targets
             )
 
-            epoch_conf_loss += conf_loss
-            epoch_loc_loss += loc_loss
-            epoch_loss += loss
+            epoch_conf_loss += conf_loss.item()
+            epoch_loc_loss += loc_loss.item()
+            epoch_loss += loss.item()
 
             # Backpropagation
             self.optimizer.zero_grad()
@@ -125,6 +129,11 @@ class Trainer:
         epoch_val_conf_loss = 0
         epoch_val_loc_loss = 0
         epoch_val_loss = 0
+        mAP = 0
+
+        max_confidences = []
+        predictions = []
+        ground_truths = []
 
         self.model.eval()
 
@@ -138,17 +147,32 @@ class Trainer:
 
                 conf_loss, loc_loss, loss = self.loss(confidences, localizations, targets)
 
-                epoch_val_conf_loss += conf_loss
-                epoch_val_loc_loss += loc_loss
-                epoch_val_loss += loss
+                epoch_val_conf_loss += conf_loss.item()
+                epoch_val_loc_loss += loc_loss.item()
+                epoch_val_loss += loss.item()
 
-            # TODO: Calculate mAP
+                confidence_tensor = torch.reshape(confidences, (-1, 21))
+                indices = confidence_tensor.argmax(1)
+                ground_truth = torch.reshape(targets[:, :, -1], (-1,))
 
-        return {
-            "val_conf_loss": epoch_val_conf_loss / len(self.val_dataloader),
-            "val_loc_loss": epoch_val_loc_loss / len(self.val_dataloader),
-            "val_total_loss": epoch_val_loss / len(self.val_dataloader),
-        }
+                max_confidences.append(confidence_tensor.max(1).values.numpy())
+                predictions.append(indices.numpy())
+                ground_truths.append(ground_truth.numpy())
+
+            records = {
+                "val_conf_loss": epoch_val_conf_loss / len(self.val_dataloader),
+                "val_loc_loss": epoch_val_loc_loss / len(self.val_dataloader),
+                "val_total_loss": epoch_val_loss / len(self.val_dataloader),
+            }
+
+            max_confidences = np.concatenate(max_confidences, axis=0)
+            predictions = np.concatenate(predictions, axis=0)
+            ground_truths = np.concatenate(ground_truths, axis=0)
+
+            # mAP += mean_average_precision(max_confidences, predictions, ground_truths, self.label_indices)
+            # records["map"] = mAP / len(self.val_dataloader)
+
+        return records
 
     def save_best_model(self, epoch: int, val_records: dict) -> None:
         """
