@@ -49,4 +49,4 @@ def non_maximum_supression(confidences, localizations, iou_threshold, device):
 
         localizations[idx][min_localizations] = 0
 
-    return confidences, localizations
+    return localizations
