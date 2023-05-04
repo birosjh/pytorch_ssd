@@ -104,7 +104,7 @@ class ImageDataset(Dataset):
 
         df = pd.read_csv(file_data_path, names=["filename"])
 
-        df["filename"] = df["filename"].str.replace(r"\s\s\d", "")
+        df["filename"] = df["filename"].str.replace(r"\s\s\d", "", regex=True)
 
         file_list = df["filename"].unique().tolist()
 
