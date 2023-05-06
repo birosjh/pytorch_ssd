@@ -110,6 +110,10 @@ class Trainer:
             epoch_loc_loss += loc_loss.item()
             epoch_loss += loss.item()
 
+            print(f"Conf: {conf_loss.item()} ")
+            print(f"Loc: {loc_loss.item()} ")
+            print(f"Total: {loss.item()} ")
+
             # Backpropagation
             self.optimizer.zero_grad()
             loss.backward()
@@ -143,7 +147,7 @@ class Trainer:
 
                 confidences, localizations = self.model(images)
 
-                confidences, localizations = non_maximum_supression(confidences, localizations, self.iou_threshold, self.device)
+                localizations = non_maximum_supression(confidences, localizations, self.iou_threshold, self.device)
 
                 conf_loss, loc_loss, loss = self.loss(confidences, localizations, targets)
 
@@ -155,9 +159,9 @@ class Trainer:
                 indices = confidence_tensor.argmax(1)
                 ground_truth = torch.reshape(targets[:, :, -1], (-1,))
 
-                max_confidences.append(confidence_tensor.max(1).values.numpy())
-                predictions.append(indices.numpy())
-                ground_truths.append(ground_truth.numpy())
+                max_confidences.append(confidence_tensor.max(1).values.cpu().numpy())
+                predictions.append(indices.cpu().numpy())
+                ground_truths.append(ground_truth.cpu().numpy())
 
             records = {
                 "val_conf_loss": epoch_val_conf_loss / len(self.val_dataloader),
