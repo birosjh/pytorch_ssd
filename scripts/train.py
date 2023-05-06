@@ -41,7 +41,7 @@ def train_model(config_path: str) -> None:
     )
 
     val_dataset = ImageDataset(
-        data_config=data_config, data_encoder=data_encoder, mode="val"
+        data_config=data_config, data_encoder=data_encoder, mode="val", device=device
     )
 
     num_classes = len(data_config["classes"]) + 1
