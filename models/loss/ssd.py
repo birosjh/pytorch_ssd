@@ -46,4 +46,8 @@ class SSDLoss(nn.Module):
 
             loss += self.alpha * localization_loss
 
+        else:
+
+            localization_loss = localization_loss.detach()
+
         return confidence_loss, localization_loss, loss
