@@ -16,7 +16,7 @@ from tqdm import tqdm
 from loggers.log_handler import LogHandler
 from models.loss.ssd import SSDLoss
 from utils.nms import non_maximum_supression
-from models.metrics.map import mean_average_precision
+from models.metrics.map import MeanAveragePrecision
 
 
 class Trainer:
@@ -58,6 +58,13 @@ class Trainer:
 
         self.iou_threshold = training_config["iou_threshold"]
         self.device = device
+
+        self.map = MeanAveragePrecision(
+            train_dataset.classes,
+            device,
+            self.iou_threshold,
+            "coco"
+        )
 
     def train(self) -> None:
         """
@@ -133,11 +140,10 @@ class Trainer:
         epoch_val_conf_loss = 0
         epoch_val_loc_loss = 0
         epoch_val_loss = 0
-        mAP = 0
 
-        max_confidences = []
-        predictions = []
-        ground_truths = []
+        all_confidences = []
+        all_localizations = []
+        all_targets = []
 
         self.model.eval()
 
@@ -155,13 +161,9 @@ class Trainer:
                 epoch_val_loc_loss += loc_loss.item()
                 epoch_val_loss += loss.item()
 
-                confidence_tensor = torch.reshape(confidences, (-1, 21))
-                indices = confidence_tensor.argmax(1)
-                ground_truth = torch.reshape(targets[:, :, -1], (-1,))
-
-                max_confidences.append(confidence_tensor.max(1).values.cpu().numpy())
-                predictions.append(indices.cpu().numpy())
-                ground_truths.append(ground_truth.cpu().numpy())
+                all_confidences.append(confidences)
+                all_localizations.append(localizations)
+                all_targets.append(targets)
 
             records = {
                 "val_conf_loss": epoch_val_conf_loss / len(self.val_dataloader),
@@ -169,12 +171,14 @@ class Trainer:
                 "val_total_loss": epoch_val_loss / len(self.val_dataloader),
             }
 
-            max_confidences = np.concatenate(max_confidences, axis=0)
-            predictions = np.concatenate(predictions, axis=0)
-            ground_truths = np.concatenate(ground_truths, axis=0)
+            all_confidences = torch.concat(all_confidences)
+            all_localizations = torch.concat(all_localizations)
+            all_targets = torch.concat(all_targets)
 
-            # mAP += mean_average_precision(max_confidences, predictions, ground_truths, self.label_indices)
-            # records["map"] = mAP / len(self.val_dataloader)
+            mAP = self.map(all_confidences, all_localizations, all_targets)
+            records["map"] = mAP / len(self.val_dataloader)
+
+            print(f"mAP: {mAP} ")
 
         return records
 
