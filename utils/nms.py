@@ -45,7 +45,7 @@ def non_maximum_supression(confidences, localizations, iou_threshold, device):
         maximum_indices = torch.cat([maximum_indices, non_overlapping_indices])
 
         min_localizations = torch.ones(localizations.shape[1], dtype=bool)
-        min_localizations[torch.tensor(maximum_indices)] = False
+        min_localizations[maximum_indices] = False
 
         localizations[idx][min_localizations] = 0
 
