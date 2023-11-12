@@ -59,6 +59,8 @@ class Trainer:
         self.iou_threshold = training_config["iou_threshold"]
         self.device = device
 
+        self.map_frequency = training_config["map_frequency"]
+
         self.map = MeanAveragePrecision(
             train_dataset.classes,
             device,
@@ -75,9 +77,9 @@ class Trainer:
             print("Epoch {}/{}".format(epoch, self.epochs - 1))
             print("-" * 10)
 
-            train_records = self.train_one_epoch()
+            train_records = self.train_one_epoch(epoch)
 
-            val_records = self.validate_one_epoch()
+            val_records = self.validate_one_epoch(epoch)
 
             self.save_best_model(epoch, val_records)
 
@@ -89,7 +91,7 @@ class Trainer:
         last_model_path = self.save_path / "last_model.pth"
         torch.save(self.model.state_dict(), last_model_path)
 
-    def train_one_epoch(self) -> dict:
+    def train_one_epoch(self, epoch) -> dict:
         """
         Run the model through one epoch of training
         """
@@ -132,7 +134,7 @@ class Trainer:
             "train_total_loss": epoch_loss / len(self.train_dataloader),
         }
 
-    def validate_one_epoch(self) -> dict:
+    def validate_one_epoch(self, epoch) -> dict:
         """
         Run the model through one epoch of validation
         """
@@ -175,10 +177,10 @@ class Trainer:
             all_localizations = torch.concat(all_localizations)
             all_targets = torch.concat(all_targets)
 
-            mAP = self.map(all_confidences, all_localizations, all_targets)
-            records["map"] = mAP / len(self.val_dataloader)
+            if epoch % self.map_frequency == 0:
 
-            print(f"mAP: {mAP} ")
+                mAP = self.map(all_confidences, all_localizations, all_targets)
+                records["mAP"] = mAP / len(self.val_dataloader)
 
         return records
 
