@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from models.loss.localization import LocalizationLoss
+from src.models.loss.localization import LocalizationLoss
 
 
 class SSDLoss(nn.Module):

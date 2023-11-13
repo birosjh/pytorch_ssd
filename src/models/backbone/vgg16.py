@@ -1,7 +1,7 @@
 import torchvision.models as models
 from torch.nn import MaxPool2d, Module, Sequential
 
-from models.layers.downsample_block import DownsampleBlock
+from src.models.layers.downsample_block import DownsampleBlock
 
 
 class Vgg16(Module):

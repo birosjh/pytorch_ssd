@@ -9,9 +9,9 @@ Contains a model with the layers explicitly written out.
 import torch
 import torch.nn as nn
 
-from models.backbone.backbone_loader import backbone_loader
-from utils.data_encoder import DataEncoder
-from utils.default_box import number_of_default_boxes_per_cell
+from src.models.backbone.backbone_loader import backbone_loader
+from src.utils.data_encoder import DataEncoder
+from src.utils.default_box import number_of_default_boxes_per_cell
 
 
 class SSD(nn.Module):

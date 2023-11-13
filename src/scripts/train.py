@@ -1,10 +1,10 @@
 import torch
 import yaml
 
-from datasets.image_dataset import ImageDataset
-from models.ssd import SSD
-from trainer.trainer import Trainer
-from utils.data_encoder import DataEncoder
+from src.datasets.image_dataset import ImageDataset
+from src.models.ssd import SSD
+from src.trainer.trainer import Trainer
+from src.utils.data_encoder import DataEncoder
 
 
 def train_model(config_path: str) -> None:

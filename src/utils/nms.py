@@ -1,7 +1,7 @@
 import torch
 
-from utils.iou import intersection_over_union
-from utils.profiler import profiler
+from src.utils.iou import intersection_over_union
+from src.utils.profiler import profiler
 
 
 @profiler("loss")

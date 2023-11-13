@@ -1,5 +1,5 @@
-from loggers.print_logger import PrintLogger
-from loggers.textfile_logger import TextFileLogger
+from src.loggers.print_logger import PrintLogger
+from src.loggers.textfile_logger import TextFileLogger
 
 
 class LogHandler:

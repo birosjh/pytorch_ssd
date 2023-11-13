@@ -1,4 +1,4 @@
-from loggers.base_logger import BaseLogger
+from src.loggers.base_logger import BaseLogger
 
 
 class PrintLogger(BaseLogger):
