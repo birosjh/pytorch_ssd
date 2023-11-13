@@ -4,9 +4,9 @@ import torch
 import yaml
 from torch.utils.data import DataLoader
 
-from datasets.image_dataset import ImageDataset
-from utils.data_encoder import DataEncoder
-from utils.default_box import (
+from src.datasets.image_dataset import ImageDataset
+from src.utils.data_encoder import DataEncoder
+from src.utils.default_box import (
     number_of_default_boxes_per_cell,
     total_number_of_default_boxes,
 )
@@ -14,7 +14,7 @@ from utils.default_box import (
 
 class TestDataloader(unittest.TestCase):
     def setUp(self):
-        with open("tests/test_config.yaml") as f:
+        with open("src/tests/test_config.yaml") as f:
             config = yaml.safe_load(f)
 
         self.data_config = config["data_configuration"]
@@ -27,7 +27,7 @@ class TestDataloader(unittest.TestCase):
         self.dataset = ImageDataset(
             data_config=self.data_config,
             data_encoder=data_encoder,
-            transform=True,
+            mode="val",
         )
 
         num_default_boxes_per_cell = number_of_default_boxes_per_cell(
@@ -49,8 +49,8 @@ class TestDataloader(unittest.TestCase):
                 [
                     self.batch_size,
                     3,  # Three channels
-                    self.data_config["figure_size"],
-                    self.data_config["figure_size"],
+                    self.model_config["figure_size"],
+                    self.model_config["figure_size"],
                 ]
             ),
         )
