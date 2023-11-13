@@ -3,16 +3,14 @@ import unittest
 import torch
 import yaml
 
-from models.metrics.map import MeanAveragePrecision
-from models.ssd import SSD
-from utils.data_encoder import DataEncoder
+from src.models.metrics.map import MeanAveragePrecision
 
 torch.set_printoptions(precision=10)
 
 
 class TestMeanAveragePrecision(unittest.TestCase):
     def setUp(self):
-        with open("tests/test_config.yaml") as f:
+        with open("src/tests/test_config.yaml") as f:
             config = yaml.safe_load(f)
 
         self.model_config = config["model_configuration"]
@@ -30,15 +28,44 @@ class TestMeanAveragePrecision(unittest.TestCase):
         print(ap)
 
     def test_coco_map_output_is_correct(self):
-        fake_batch = torch.zeros(1, 3, 256, 256)
-        ground_truths = torch.zeros(1, 6132, 21)
+        ground_truths = (
+            torch.tensor(
+                [
+                    [174, 101, 349, 351, 1],
+                    [169, 104, 209, 146, 2],
+                    [278, 210, 297, 233, 3],
+                    [273, 333, 297, 354, 4],
+                    [319, 307, 340, 326, 5],
+                ]
+            )
+            .unsqueeze(dim=0)
+            .type(torch.float)
+        )
 
-        num_classes = len(self.data_config["classes"]) + 1
+        ground_truths[:, :, 0:4] /= 500
 
-        data_encoder = DataEncoder(self.model_config)
-        model = SSD(self.model_config, num_classes, data_encoder, "cpu")
+        confidences = torch.tensor(
+            [
+                [0.1, 0.5, 0.1, 0.1, 0.1, 0.1],
+                [0.1, 0.1, 0.5, 0.1, 0.1, 0.1],
+                [0.1, 0.1, 0.1, 0.1, 0.2, 0.3],
+                [0.1, 0.1, 0.1, 0.2, 0.4, 0.1],
+                [0.1, 0.1, 0.1, 0.1, 0.0, 0.6],
+            ]
+        ).unsqueeze(dim=0)
 
-        confidences, localizations = model(fake_batch)
+        localizations = (
+            torch.tensor(
+                [
+                    [175, 111, 349, 351],
+                    [159, 94, 209, 146],
+                    [278, 210, 267, 253],
+                    [273, 333, 297, 354],
+                    [339, 317, 370, 346],
+                ]
+            ).unsqueeze(dim=0)
+            / 500
+        )
 
         ap = self.map.coco_mean_average_precision(
             confidences, localizations, ground_truths

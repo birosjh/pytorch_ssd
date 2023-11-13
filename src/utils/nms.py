@@ -1,10 +1,8 @@
 import torch
 
 from src.utils.iou import intersection_over_union
-from src.utils.profiler import profiler
 
 
-@profiler("loss")
 def non_maximum_supression(confidences, localizations, iou_threshold, device):
     for idx in range(len(confidences)):
         boxes = localizations[idx]

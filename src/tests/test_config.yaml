@@ -21,10 +21,10 @@ training_configuration:
     map_frequency: 5 # How often to run map calculation
 
 data_configuration:
-    train: "tests/test_data/test_data.txt"
-    val: "tests/test_data/test_data.txt"
-    image_directory: "tests/test_data/JPEGImages"
-    annotation_directory: "tests/test_data/Annotations"
+    train: "src/tests/test_data/test_data.txt"
+    val: "src/tests/test_data/test_data.txt"
+    image_directory: "src/tests/test_data/JPEGImages"
+    annotation_directory: "src/tests/test_data/Annotations"
     classes: ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus', 'car', 'cat', 'chair', 'cow', 'diningtable', 'dog', 'horse', 'motorbike', 'person', 'pottedplant', 'sheep', 'sofa', 'train', 'tvmonitor']
 
     transformations:
