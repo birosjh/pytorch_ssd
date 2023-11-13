@@ -26,7 +26,6 @@ class ImageDataset(Dataset):
         device: str = "cpu",
         iou_threshold: float = 0.5,
     ):
-
         self.visualize = visualize
 
         # Read in necessary configs
@@ -53,7 +52,6 @@ class ImageDataset(Dataset):
         return len(self.file_list)
 
     def __getitem__(self, idx: int):
-
         # Select filename from list
         filename = self.file_list[idx]
 
@@ -85,7 +83,6 @@ class ImageDataset(Dataset):
         )
 
         if self.visualize:
-
             return (image, label_tensor)
 
         # This seems bad, but I will revist it later when I check for bottlenecks
@@ -146,13 +143,12 @@ class ImageDataset(Dataset):
 
         objects = annotation["annotation"]["object"]
 
-        if type(objects) is not list:
+        if not isinstance(objects, list):
             objects = [objects]
 
         labels = []
 
         for obj in objects:
-
             box = obj["bndbox"]
 
             labels.append(

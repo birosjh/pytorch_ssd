@@ -10,7 +10,6 @@ from utils.data_encoder import DataEncoder
 
 class TestSSD(unittest.TestCase):
     def setUp(self):
-
         with open("tests/test_config.yaml") as f:
             config = yaml.safe_load(f)
 
@@ -39,7 +38,6 @@ class TestSSD(unittest.TestCase):
         self.model = SSD(model_config, num_classes).to("cpu")
 
     def test_explicit_model_outputs_properly(self):
-
         images, labels = next(iter(self.dataloader))
 
         loc, conf = self.model(images)

@@ -9,7 +9,6 @@ torch.set_printoptions(precision=10)
 
 class TestIou(unittest.TestCase):
     def test_single_iou_output_is_correct(self):
-
         box1 = torch.tensor([[200.0, 300.0, 350.0, 400.0]])
         box2 = torch.tensor([[250.0, 250.0, 400.0, 350.0]])
 
@@ -21,7 +20,6 @@ class TestIou(unittest.TestCase):
         self.assertTrue(equivalence_check.numpy())
 
     def test_multiple_iou_output_is_correct(self):
-
         box1 = torch.tensor(
             [[200.0, 300.0, 350.0, 400.0], [250.0, 250.0, 400.0, 350.0]]
         )
@@ -49,7 +47,6 @@ class TestIou(unittest.TestCase):
         self.assertTrue(equivalence_check.numpy())
 
     def test_sandbox(self):
-
         boxes = torch.tensor(
             [
                 [20.0, 30.0, 35.0, 40.0],

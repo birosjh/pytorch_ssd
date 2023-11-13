@@ -6,7 +6,6 @@ from models.layers.downsample_block import DownsampleBlock
 
 class Vgg16(Module):
     def __init__(self, config):
-
         super(Vgg16, self).__init__()
 
         vgg16 = models.vgg16(weights="IMAGENET1K_V1")
@@ -21,9 +20,7 @@ class Vgg16(Module):
         )
 
     def forward(self, x):
-
         return self.model(x)
 
     def output_channels(self):
-
         return [256, 512, 512, 256, 128, 128]

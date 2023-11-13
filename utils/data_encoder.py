@@ -16,11 +16,9 @@ from utils.iou import intersection_over_union
 
 class DataEncoder:
     def __init__(self, default_box_config):
-
         self.default_boxes = self.create_default_boxes(default_box_config)
 
     def create_default_boxes(self, default_box_config: dict) -> torch.Tensor:
-
         figure_size = default_box_config["figure_size"]
         feature_map_sizes = default_box_config["feature_map_sizes"]
         steps = default_box_config["steps"]
@@ -33,7 +31,6 @@ class DataEncoder:
         fk = figure_size / np.array(steps)
 
         for idx, size in enumerate(feature_map_sizes):
-
             # Scale for Aspect Ratio 1
             sk = scales[idx] / figure_size
             # Additional Scale for Aspect Ratio 1
@@ -73,7 +70,6 @@ class DataEncoder:
         return dboxes_ltrb
 
     def encode(self, bounding_boxes, labels_in, criteria: float = 0.5) -> torch.Tensor:
-
         num_default_boxes = self.default_boxes.size(0)
 
         # Returns a matrix of ious for each bbox and each dbox

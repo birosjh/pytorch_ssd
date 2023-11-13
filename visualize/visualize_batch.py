@@ -14,7 +14,6 @@ TEXT_COLOR = (0, 0, 0)
 
 
 def get_color_from_list(class_id: int, color_list: list) -> tuple:
-
     return tuple((color_list[class_id] * 256)[0:-1].astype(int).tolist())
 
 
@@ -114,13 +113,11 @@ def visualize_batch(config_path: str, val: bool = False) -> None:
     color_list = cmap(range(len(data_config["classes"])))
 
     for image, labelset in zip(images, labels):
-
         np_image = image.permute(1, 2, 0).numpy().copy().astype(np.uint8)
 
         np_labels = labelset[labelset[:, -1] > 0].numpy().astype(int)
 
         for label in np_labels:
-
             np_image = visualize_bbox(
                 np_image, label, color_list, data_config["classes"]
             )

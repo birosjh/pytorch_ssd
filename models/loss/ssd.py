@@ -19,7 +19,6 @@ class SSDLoss(nn.Module):
         pred_localizations: torch.Tensor,
         targets: torch.Tensor,
     ) -> tuple:
-
         pred_confidences = torch.max(pred_confidences, dim=2).indices.type(
             torch.float32
         )
@@ -48,7 +47,6 @@ class SSDLoss(nn.Module):
         loss = confidence_loss
 
         if localization_loss > 0:
-
             loss += self.alpha * localization_loss
 
         return confidence_loss, localization_loss, loss

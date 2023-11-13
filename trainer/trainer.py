@@ -28,7 +28,6 @@ class Trainer:
     def __init__(
         self, model, train_dataset, val_dataset, training_config, device
     ) -> None:
-
         self.model = model.to(device)
 
         self.train_dataloader = DataLoader(
@@ -100,7 +99,6 @@ class Trainer:
         self.model.train()
 
         for images, targets in tqdm(self.train_dataloader):
-
             self.optimizer.zero_grad()
 
             # Compute prediction and loss
@@ -142,9 +140,7 @@ class Trainer:
         self.model.eval()
 
         with torch.no_grad():
-
             for images, targets in tqdm(self.val_dataloader):
-
                 confidences, localizations = self.model(images)
 
                 localizations = non_maximum_supression(
@@ -174,7 +170,6 @@ class Trainer:
             all_targets = torch.concat(all_targets)
 
             if epoch % self.map_frequency == 0:
-
                 mAP = self.map(all_confidences, all_localizations, all_targets)
                 records["mAP"] = mAP / len(self.val_dataloader)
 
@@ -195,11 +190,9 @@ class Trainer:
         validation_loss = val_records["val_total_loss"]
 
         if epoch == 0:
-
             self.lowest_validation_loss = validation_loss
 
         if validation_loss < self.lowest_validation_loss:
-
             self.lowest_validation_loss = validation_loss
 
             torch.save(self.model.state_dict(), best_model_path)

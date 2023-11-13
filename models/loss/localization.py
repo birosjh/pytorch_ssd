@@ -13,11 +13,9 @@ class LocalizationLoss(nn.Module):
         self.smooth_l1 = nn.SmoothL1Loss()
 
     def forward(self, predictions, targets):
-
         # As specified in the SSD paper, set to zero when no
         # examples are predicted correctly
         if len(predictions) == 0:
-
             return torch.tensor(0)
 
         return self.smooth_l1(predictions, targets)

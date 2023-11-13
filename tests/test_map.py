@@ -12,7 +12,6 @@ torch.set_printoptions(precision=10)
 
 class TestMeanAveragePrecision(unittest.TestCase):
     def setUp(self):
-
         with open("tests/test_config.yaml") as f:
             config = yaml.safe_load(f)
 
@@ -22,7 +21,6 @@ class TestMeanAveragePrecision(unittest.TestCase):
         self.map = MeanAveragePrecision(self.data_config["classes"], "cpu", "coco")
 
     def test_average_precision_output_is_correct(self):
-
         confidences = torch.tensor([0.32, 0.84, 0.11, 0.51, 0.62, 0.78])
         is_true_positive = torch.tensor([0, 1, 0, 1, 0, 1])
         is_true_positive = is_true_positive > 0
@@ -32,7 +30,6 @@ class TestMeanAveragePrecision(unittest.TestCase):
         print(ap)
 
     def test_coco_map_output_is_correct(self):
-
         fake_batch = torch.zeros(1, 3, 256, 256)
         ground_truths = torch.zeros(1, 6132, 21)
 

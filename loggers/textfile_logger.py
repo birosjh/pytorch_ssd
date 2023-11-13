@@ -9,7 +9,6 @@ class TextFileLogger(BaseLogger):
     """
 
     def __init__(self):
-
         self.folderpath = Path("logs")
         self.folderpath.mkdir(parents=True, exist_ok=True)
 
@@ -25,7 +24,6 @@ class TextFileLogger(BaseLogger):
         """
 
         if epoch == 0:
-
             record_names = list(records.keys())
 
             self.create_text_file(record_names)
@@ -33,7 +31,6 @@ class TextFileLogger(BaseLogger):
         line = f"{epoch}"
 
         for record_name, record_value in records.items():
-
             line += f",{record_value}"
 
         line += "\n"

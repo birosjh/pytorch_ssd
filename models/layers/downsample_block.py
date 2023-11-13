@@ -3,7 +3,6 @@ import torch.nn as nn
 
 class DownsampleBlock(nn.Module):
     def __init__(self, in_channels, out_channels):
-
         super(DownsampleBlock, self).__init__()
 
         self.block = nn.Sequential(
@@ -15,5 +14,4 @@ class DownsampleBlock(nn.Module):
         )
 
     def forward(self, x):
-
         return self.block(x)

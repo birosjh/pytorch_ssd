@@ -7,7 +7,6 @@ class PrintLogger(BaseLogger):
     """
 
     def __init__(self) -> None:
-
         pass
 
     def log(self, records: dict, epoch: int) -> None:
@@ -22,5 +21,4 @@ class PrintLogger(BaseLogger):
         print(f"Epoch: {epoch}")
 
         for record_name, record_value in records.items():
-
             print(f"{record_name}: {record_value}")

@@ -10,7 +10,6 @@ from utils.data_encoder import DataEncoder
 
 
 def load_configurations():
-
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--config", action="store", required=True)
@@ -23,13 +22,11 @@ def load_configurations():
 
 
 def get_box_groups(encoder_config, default_boxes):
-
     box_groups = {}
 
     counter = 0
 
     for idx, map_size in enumerate(encoder_config["feature_map_sizes"]):
-
         num_aspect_ratios = 2 + len(encoder_config["aspect_ratios"][idx]) * 2
         num_boxes = map_size * map_size * num_aspect_ratios
 
@@ -46,7 +43,6 @@ def get_box_groups(encoder_config, default_boxes):
 
 
 def main():
-
     config = load_configurations()
 
     encoder_config = config["simple_model_configuration"]
@@ -82,5 +78,4 @@ def main():
 
 
 if __name__ == "__main__":
-
     main()

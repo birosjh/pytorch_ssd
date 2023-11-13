@@ -6,16 +6,13 @@ from utils.nms import non_maximum_supression
 
 class MeanAveragePrecision:
     def __init__(self, classes, device, iou_threshold, map_type="coco"):
-
         self.classes = classes
         self.device = device
         self.map_type = map_type
         self.iou_threshold = iou_threshold
 
     def __call__(self, confidences, localizations, ground_truths):
-
         if self.map_type == "pascal":
-
             return self.mean_average_precision(
                 confidences, localizations, ground_truths, self.iou_threshold
             )
@@ -27,11 +24,9 @@ class MeanAveragePrecision:
     def average_precision(
         self, confidences: torch.tensor, is_true_positive: torch.tensor
     ):
-
         ap = 0
 
         if len(confidences) == 0:
-
             return ap
 
         # Sort by confidence
@@ -48,7 +43,6 @@ class MeanAveragePrecision:
         recalls = [0]
 
         for is_tp in is_true_positive[sorted_indices]:
-
             tp_count += is_tp.long()
             fp_count += (~is_tp).long()
 
@@ -56,7 +50,6 @@ class MeanAveragePrecision:
             recalls.append(tp_count / tp_total)
 
         for idx in range(len(precisions) - 1, 0, -1):
-
             precision = (
                 precisions[idx].item()
                 if precisions[idx].item() > precision
@@ -74,7 +67,6 @@ class MeanAveragePrecision:
         ground_truths: torch.tensor,
         iou_threshold: float,
     ) -> float:
-
         average_precisions = []
 
         localizations = non_maximum_supression(
@@ -84,12 +76,10 @@ class MeanAveragePrecision:
         for confidence, localization, ground_truth in zip(
             confidences, localizations, ground_truths
         ):
-
             filtered_confidences = confidence[(localization.sum(dim=1) != 0)]
             filtered_ground_truths = ground_truth[(localization.sum(dim=1) != 0)]
 
             for class_id in range(len(self.classes)):
-
                 positives = filtered_confidences.argmax(dim=1) == class_id
 
                 positive_confidences = filtered_confidences[positives]
@@ -116,13 +106,11 @@ class MeanAveragePrecision:
         localizations: torch.tensor,
         ground_truths: torch.tensor,
     ) -> float:
-
         iou_thresholds = np.arange(0.05, 0.95, 0.05)
 
         coco_mAP = 0
 
         for threshold in iou_thresholds:
-
             coco_mAP += self.mean_average_precision(
                 confidences, localizations, ground_truths, threshold
             )

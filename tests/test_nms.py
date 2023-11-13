@@ -7,7 +7,6 @@ from utils.nms import non_maximum_supression
 
 class TestNonMaximumSupression(unittest.TestCase):
     def test_that_nms_deletes_one_overlapping(self):
-
         iou_threshold = 0.5
 
         confidences = torch.tensor(
@@ -43,7 +42,6 @@ class TestNonMaximumSupression(unittest.TestCase):
         self.assertTrue(torch.allclose(output, answer))
 
     def test_that_nms_deletes_multiple_overlapping(self):
-
         iou_threshold = 0.5
 
         confidences = torch.tensor(
@@ -82,7 +80,6 @@ class TestNonMaximumSupression(unittest.TestCase):
         self.assertTrue(torch.allclose(output, answer))
 
     def test_that_nms_leaves_overlapping_below_thresh(self):
-
         iou_threshold = 0.5
 
         confidences = torch.tensor(
@@ -121,7 +118,6 @@ class TestNonMaximumSupression(unittest.TestCase):
         self.assertTrue(torch.allclose(output, answer))
 
     def test_nms_leaves_non_overlapping(self):
-
         iou_threshold = 0.5
 
         confidences = torch.tensor(
@@ -160,7 +156,6 @@ class TestNonMaximumSupression(unittest.TestCase):
         self.assertTrue(torch.allclose(output, answer))
 
     def test_that_nms_deletes_exact_overlap(self):
-
         iou_threshold = 0.5
 
         confidences = torch.tensor(

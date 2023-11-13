@@ -6,9 +6,7 @@ from utils.profiler import profiler
 
 @profiler("loss")
 def non_maximum_supression(confidences, localizations, iou_threshold, device):
-
     for idx in range(len(confidences)):
-
         boxes = localizations[idx]
         confs = confidences[idx]
 
@@ -29,7 +27,6 @@ def non_maximum_supression(confidences, localizations, iou_threshold, device):
         non_overlapping_indices = confidence_indices[~is_overlapping]
 
         while len(overlapping_indices) > 0:
-
             # Select highest confidence value in list
             index_of_max = torch.max(
                 highest_confidence[overlapping_indices], 0
