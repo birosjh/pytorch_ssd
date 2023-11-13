@@ -50,7 +50,6 @@ def inference(config_path: str, image_path: str, output_path: str) -> None:
     np_labels = predictions[predictions[:, -1] > 0].numpy().astype(int)
 
     for label in np_labels:
-
         np_image = visualize_bbox(np_image, label, color_list, data_config["classes"])
 
     cv2.imwrite(output_path, np_image)

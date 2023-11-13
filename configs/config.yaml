@@ -11,18 +11,18 @@ training_configuration:
     loggers: # Printing is on by default
         tensorboard: True
         textfile: True
-    learning_rate: 0.001
+    learning_rate: 0.0001
     alpha: 0.9
     batch_size: 4
-    epochs: 50
+    epochs: 11
     num_workers: 0
     model_save_path: "saved_models"
     iou_threshold: 0.5
     map_frequency: 5 # How often to run map calculation
 
 data_configuration:
-    train: "./data/train.txt"
-    val: "./data/val.txt"
+    train: "./data/train_debug.txt"
+    val: "./data/val_debug.txt"
     image_directory: "./data/JPEGImages"
     annotation_directory: "./data/Annotations"
     classes: ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus', 'car', 'cat', 'chair', 'cow', 'diningtable', 'dog', 'horse', 'motorbike', 'person', 'pottedplant', 'sheep', 'sofa', 'train', 'tvmonitor']

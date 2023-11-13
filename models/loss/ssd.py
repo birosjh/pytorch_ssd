@@ -13,9 +13,15 @@ class SSDLoss(nn.Module):
         self.confidence_loss = nn.CrossEntropyLoss()
         self.localization_loss = LocalizationLoss()
 
-    def forward(self, pred_confidences: torch.Tensor, pred_localizations: torch.Tensor, targets: torch.Tensor) -> tuple:
-
-        pred_confidences = torch.max(pred_confidences, dim=2).indices.type(torch.float32)
+    def forward(
+        self,
+        pred_confidences: torch.Tensor,
+        pred_localizations: torch.Tensor,
+        targets: torch.Tensor,
+    ) -> tuple:
+        pred_confidences = torch.max(pred_confidences, dim=2).indices.type(
+            torch.float32
+        )
 
         target_confidences = targets[:, :, -1]
         target_localizations = targets[:, :, 0:-1]
@@ -29,25 +35,18 @@ class SSDLoss(nn.Module):
             pred_confidences == target_confidences
         ]
 
-        print(len(matched_pred_localizations))
-
         localization_loss = self.localization_loss(
             matched_pred_localizations, matched_target_localizations
         )
 
         num_matched = torch.sum(pred_confidences == target_confidences)
 
-        # confidence_loss /= num_matched
-        # localization_loss /= num_matched
+        confidence_loss /= num_matched
+        localization_loss /= num_matched
 
         loss = confidence_loss
 
         if localization_loss > 0:
-
             loss += self.alpha * localization_loss
-
-        else:
-
-            localization_loss = localization_loss.detach()
 
         return confidence_loss, localization_loss, loss

@@ -1,8 +1,6 @@
 import torch
 import yaml
 
-from torch.utils.data import Subset
-
 from datasets.image_dataset import ImageDataset
 from models.ssd import SSD
 from trainer.trainer import Trainer
@@ -22,10 +20,8 @@ def train_model(config_path: str) -> None:
 
     # Use GPU if available
     try:
-
         device = "mps" if torch.backends.mps.is_available() else "cpu"
     except AttributeError:
-
         device = "cuda" if torch.cuda.is_available() else "cpu"
 
     print("Using {} device".format(device))

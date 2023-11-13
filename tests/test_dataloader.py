@@ -14,7 +14,6 @@ from utils.default_box import (
 
 class TestDataloader(unittest.TestCase):
     def setUp(self):
-
         with open("tests/test_config.yaml") as f:
             config = yaml.safe_load(f)
 
@@ -40,7 +39,6 @@ class TestDataloader(unittest.TestCase):
         )
 
     def test_the_shape_a_the_batch(self):
-
         dataloader = DataLoader(self.dataset, batch_size=self.batch_size, num_workers=0)
 
         images, labels = next(iter(dataloader))

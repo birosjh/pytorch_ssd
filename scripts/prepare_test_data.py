@@ -20,13 +20,11 @@ test_data_path.joinpath(JPEGIMAGES).mkdir(parents=True, exist_ok=True)
 test_data_file = test_data_path.joinpath("test_data.txt")
 
 with open(test_data_file, "r") as outfile:
-
     lines = outfile.readlines()
 
 
 # Copy files from data to test data
 for line in lines:
-
     filename = line.split(" ")[0]
 
     copyfile(

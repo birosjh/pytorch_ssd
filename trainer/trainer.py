@@ -8,15 +8,15 @@ Contains a trainer to train an SSD model with the specified dataset.
 
 from pathlib import Path
 
-import torch
 import numpy as np
+import torch
 from torch.utils.data import DataLoader
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 from loggers.log_handler import LogHandler
 from models.loss.ssd import SSDLoss
-from utils.nms import non_maximum_supression
 from models.metrics.map import MeanAveragePrecision
+from utils.nms import non_maximum_supression
 
 
 class Trainer:
@@ -28,7 +28,6 @@ class Trainer:
     def __init__(
         self, model, train_dataset, val_dataset, training_config, device
     ) -> None:
-
         self.model = model.to(device)
 
         self.train_dataloader = DataLoader(
@@ -59,11 +58,10 @@ class Trainer:
         self.iou_threshold = training_config["iou_threshold"]
         self.device = device
 
+        self.map_frequency = training_config["map_frequency"]
+
         self.map = MeanAveragePrecision(
-            train_dataset.classes,
-            device,
-            self.iou_threshold,
-            "coco"
+            train_dataset.classes, device, self.iou_threshold, "coco"
         )
 
     def train(self) -> None:
@@ -75,9 +73,9 @@ class Trainer:
             print("Epoch {}/{}".format(epoch, self.epochs - 1))
             print("-" * 10)
 
-            train_records = self.train_one_epoch()
+            train_records = self.train_one_epoch(epoch)
 
-            val_records = self.validate_one_epoch()
+            val_records = self.validate_one_epoch(epoch)
 
             self.save_best_model(epoch, val_records)
 
@@ -89,7 +87,7 @@ class Trainer:
         last_model_path = self.save_path / "last_model.pth"
         torch.save(self.model.state_dict(), last_model_path)
 
-    def train_one_epoch(self) -> dict:
+    def train_one_epoch(self, epoch) -> dict:
         """
         Run the model through one epoch of training
         """
@@ -101,28 +99,22 @@ class Trainer:
         self.model.train()
 
         for images, targets in tqdm(self.train_dataloader):
+            self.optimizer.zero_grad()
 
             # Compute prediction and loss
             confidences, localizations = self.model(images)
 
-            localizations = non_maximum_supression(confidences, localizations, self.iou_threshold, self.device)
-
-            conf_loss, loc_loss, loss = self.loss(
-                confidences,
-                localizations,
-                targets
+            localizations = non_maximum_supression(
+                confidences, localizations, self.iou_threshold, self.device
             )
+
+            conf_loss, loc_loss, loss = self.loss(confidences, localizations, targets)
 
             epoch_conf_loss += conf_loss.item()
             epoch_loc_loss += loc_loss.item()
             epoch_loss += loss.item()
 
-            print(f"Conf: {conf_loss.item()} ")
-            print(f"Loc: {loc_loss.item()} ")
-            print(f"Total: {loss.item()} ")
-
             # Backpropagation
-            self.optimizer.zero_grad()
             loss.backward()
             self.optimizer.step()
 
@@ -132,7 +124,7 @@ class Trainer:
             "train_total_loss": epoch_loss / len(self.train_dataloader),
         }
 
-    def validate_one_epoch(self) -> dict:
+    def validate_one_epoch(self, epoch) -> dict:
         """
         Run the model through one epoch of validation
         """
@@ -148,14 +140,16 @@ class Trainer:
         self.model.eval()
 
         with torch.no_grad():
-
             for images, targets in tqdm(self.val_dataloader):
-
                 confidences, localizations = self.model(images)
 
-                localizations = non_maximum_supression(confidences, localizations, self.iou_threshold, self.device)
+                localizations = non_maximum_supression(
+                    confidences, localizations, self.iou_threshold, self.device
+                )
 
-                conf_loss, loc_loss, loss = self.loss(confidences, localizations, targets)
+                conf_loss, loc_loss, loss = self.loss(
+                    confidences, localizations, targets
+                )
 
                 epoch_val_conf_loss += conf_loss.item()
                 epoch_val_loc_loss += loc_loss.item()
@@ -175,10 +169,9 @@ class Trainer:
             all_localizations = torch.concat(all_localizations)
             all_targets = torch.concat(all_targets)
 
-            mAP = self.map(all_confidences, all_localizations, all_targets)
-            records["map"] = mAP / len(self.val_dataloader)
-
-            print(f"mAP: {mAP} ")
+            if epoch % self.map_frequency == 0:
+                mAP = self.map(all_confidences, all_localizations, all_targets)
+                records["mAP"] = mAP / len(self.val_dataloader)
 
         return records
 
@@ -197,11 +190,9 @@ class Trainer:
         validation_loss = val_records["val_total_loss"]
 
         if epoch == 0:
-
             self.lowest_validation_loss = validation_loss
 
         if validation_loss < self.lowest_validation_loss:
-
             self.lowest_validation_loss = validation_loss
 
             torch.save(self.model.state_dict(), best_model_path)

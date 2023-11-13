@@ -11,7 +11,6 @@ class Transformations:
     """
 
     def __init__(self, config: dict, mode: str) -> None:
-
         if config["transform"] and mode == "train":
             self.transform = A.Compose(
                 [
