@@ -1,10 +1,10 @@
-import torch
 import numpy as np
+import torch
 
 from utils.nms import non_maximum_supression
 
-class MeanAveragePrecision:
 
+class MeanAveragePrecision:
     def __init__(self, classes, device, iou_threshold, map_type="coco"):
 
         self.classes = classes
@@ -16,11 +16,17 @@ class MeanAveragePrecision:
 
         if self.map_type == "pascal":
 
-            return self.mean_average_precision(confidences, localizations, ground_truths, self.iou_threshold)
+            return self.mean_average_precision(
+                confidences, localizations, ground_truths, self.iou_threshold
+            )
 
-        return self.coco_mean_average_precision(confidences, localizations, ground_truths)
+        return self.coco_mean_average_precision(
+            confidences, localizations, ground_truths
+        )
 
-    def average_precision(self, confidences: torch.tensor, is_true_positive: torch.tensor):
+    def average_precision(
+        self, confidences: torch.tensor, is_true_positive: torch.tensor
+    ):
 
         ap = 0
 
@@ -51,14 +57,23 @@ class MeanAveragePrecision:
 
         for idx in range(len(precisions) - 1, 0, -1):
 
-            precision = precisions[idx].item() if precisions[idx].item() > precision else precision
-        
+            precision = (
+                precisions[idx].item()
+                if precisions[idx].item() > precision
+                else precision
+            )
+
             ap += (recalls[idx] - recalls[idx - 1]) * precision
 
         return ap
 
-
-    def mean_average_precision(self, confidences: torch.tensor, localizations: torch.tensor, ground_truths: torch.tensor, iou_threshold: float) -> float:
+    def mean_average_precision(
+        self,
+        confidences: torch.tensor,
+        localizations: torch.tensor,
+        ground_truths: torch.tensor,
+        iou_threshold: float,
+    ) -> float:
 
         average_precisions = []
 
@@ -66,7 +81,9 @@ class MeanAveragePrecision:
             confidences, localizations, iou_threshold, self.device
         )
 
-        for confidence, localization, ground_truth in zip(confidences, localizations, ground_truths):
+        for confidence, localization, ground_truth in zip(
+            confidences, localizations, ground_truths
+        ):
 
             filtered_confidences = confidence[(localization.sum(dim=1) != 0)]
             filtered_ground_truths = ground_truth[(localization.sum(dim=1) != 0)]
@@ -78,11 +95,13 @@ class MeanAveragePrecision:
                 positive_confidences = filtered_confidences[positives]
                 ground_truths_of_positives = filtered_ground_truths[positives]
 
-                is_true_positive = (positive_confidences.argmax(dim=1) == ground_truths_of_positives.argmax(dim=1))
+                is_true_positive = positive_confidences.argmax(
+                    dim=1
+                ) == ground_truths_of_positives.argmax(dim=1)
 
                 ap = self.average_precision(
-                        positive_confidences.argmax(dim=1),
-                        is_true_positive,
+                    positive_confidences.argmax(dim=1),
+                    is_true_positive,
                 )
 
                 average_precisions.append(ap)
@@ -91,7 +110,12 @@ class MeanAveragePrecision:
 
         return mAP
 
-    def coco_mean_average_precision(self, confidences: torch.tensor, localizations: torch.tensor, ground_truths: torch.tensor) -> float:
+    def coco_mean_average_precision(
+        self,
+        confidences: torch.tensor,
+        localizations: torch.tensor,
+        ground_truths: torch.tensor,
+    ) -> float:
 
         iou_thresholds = np.arange(0.05, 0.95, 0.05)
 
@@ -104,5 +128,3 @@ class MeanAveragePrecision:
             )
 
         return coco_mAP / len(iou_thresholds)
-
-        

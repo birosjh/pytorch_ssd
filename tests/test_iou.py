@@ -50,13 +50,15 @@ class TestIou(unittest.TestCase):
 
     def test_sandbox(self):
 
-        boxes = torch.tensor([
-            [20.0, 30.0, 35.0, 40.0],
-            [25.0, 25.0, 40.0, 35.0],
-            [25.0, 25.0, 45.0, 35.0],
-            [100.0, 100.0, 120.0, 120.0],
-            [35.0, 30.0, 55.0, 40.0],
-        ])
+        boxes = torch.tensor(
+            [
+                [20.0, 30.0, 35.0, 40.0],
+                [25.0, 25.0, 40.0, 35.0],
+                [25.0, 25.0, 45.0, 35.0],
+                [100.0, 100.0, 120.0, 120.0],
+                [35.0, 30.0, 55.0, 40.0],
+            ]
+        )
 
         ious = intersection_over_union(boxes, boxes)
 
@@ -66,4 +68,8 @@ class TestIou(unittest.TestCase):
         print(ious.sum(dim=0))
 
         print(~torch.isclose(ious.sum(dim=0), ious.max(dim=0).values))
-        print((~torch.isclose(ious.sum(dim=0), ious.max(dim=0).values)).nonzero(as_tuple=True)[0])
+        print(
+            (~torch.isclose(ious.sum(dim=0), ious.max(dim=0).values)).nonzero(
+                as_tuple=True
+            )[0]
+        )

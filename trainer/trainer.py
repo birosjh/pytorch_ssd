@@ -8,15 +8,15 @@ Contains a trainer to train an SSD model with the specified dataset.
 
 from pathlib import Path
 
-import torch
 import numpy as np
+import torch
 from torch.utils.data import DataLoader
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 from loggers.log_handler import LogHandler
 from models.loss.ssd import SSDLoss
-from utils.nms import non_maximum_supression
 from models.metrics.map import MeanAveragePrecision
+from utils.nms import non_maximum_supression
 
 
 class Trainer:
@@ -62,10 +62,7 @@ class Trainer:
         self.map_frequency = training_config["map_frequency"]
 
         self.map = MeanAveragePrecision(
-            train_dataset.classes,
-            device,
-            self.iou_threshold,
-            "coco"
+            train_dataset.classes, device, self.iou_threshold, "coco"
         )
 
     def train(self) -> None:
@@ -104,27 +101,22 @@ class Trainer:
 
         for images, targets in tqdm(self.train_dataloader):
 
+            self.optimizer.zero_grad()
+
             # Compute prediction and loss
             confidences, localizations = self.model(images)
 
-            localizations = non_maximum_supression(confidences, localizations, self.iou_threshold, self.device)
-
-            conf_loss, loc_loss, loss = self.loss(
-                confidences,
-                localizations,
-                targets
+            localizations = non_maximum_supression(
+                confidences, localizations, self.iou_threshold, self.device
             )
+
+            conf_loss, loc_loss, loss = self.loss(confidences, localizations, targets)
 
             epoch_conf_loss += conf_loss.item()
             epoch_loc_loss += loc_loss.item()
             epoch_loss += loss.item()
 
-            print(f"Conf: {conf_loss.item()} ")
-            print(f"Loc: {loc_loss.item()} ")
-            print(f"Total: {loss.item()} ")
-
             # Backpropagation
-            self.optimizer.zero_grad()
             loss.backward()
             self.optimizer.step()
 
@@ -155,9 +147,13 @@ class Trainer:
 
                 confidences, localizations = self.model(images)
 
-                localizations = non_maximum_supression(confidences, localizations, self.iou_threshold, self.device)
+                localizations = non_maximum_supression(
+                    confidences, localizations, self.iou_threshold, self.device
+                )
 
-                conf_loss, loc_loss, loss = self.loss(confidences, localizations, targets)
+                conf_loss, loc_loss, loss = self.loss(
+                    confidences, localizations, targets
+                )
 
                 epoch_val_conf_loss += conf_loss.item()
                 epoch_val_loc_loss += loc_loss.item()

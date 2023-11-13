@@ -24,7 +24,7 @@ class ImageDataset(Dataset):
         mode: str = "train",
         visualize: bool = False,
         device: str = "cpu",
-        iou_threshold: float = 0.5
+        iou_threshold: float = 0.5,
     ):
 
         self.visualize = visualize
@@ -75,12 +75,14 @@ class ImageDataset(Dataset):
         bounding_boxes = label_tensor[:, 0:4]
         labels_in = label_tensor[:, 4]
 
-        encoded_boxes, labels_out = self.data_encoder.encode(bounding_boxes, labels_in, self.iou_threshold)
+        encoded_boxes, labels_out = self.data_encoder.encode(
+            bounding_boxes, labels_in, self.iou_threshold
+        )
 
         # Rejoin the encoded boxes and labels
-        label_tensor = torch.cat(
-            (encoded_boxes, labels_out.unsqueeze(1)), 1
-        ).to(self.device)
+        label_tensor = torch.cat((encoded_boxes, labels_out.unsqueeze(1)), 1).to(
+            self.device
+        )
 
         if self.visualize:
 

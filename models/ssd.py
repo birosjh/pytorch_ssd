@@ -10,13 +10,19 @@ import torch
 import torch.nn as nn
 
 from models.backbone.backbone_loader import backbone_loader
-from utils.default_box import number_of_default_boxes_per_cell
-from utils.iou import intersection_over_union
 from utils.data_encoder import DataEncoder
+from utils.default_box import number_of_default_boxes_per_cell
 
 
 class SSD(nn.Module):
-    def __init__(self, config: dict, num_classes: int, data_encoder: DataEncoder, device: str, encode: bool = True) -> None:
+    def __init__(
+        self,
+        config: dict,
+        num_classes: int,
+        data_encoder: DataEncoder,
+        device: str,
+        encode: bool = True,
+    ) -> None:
         # Always have to do this when making a new model
         super(SSD, self).__init__()
 
@@ -40,14 +46,12 @@ class SSD(nn.Module):
         for num_anchors, output_channels in zip(num_defaults_per_cell, output_channels):
 
             self.loc_layers.append(
-                self.bbox_predictor(
-                    output_channels, num_anchors
-                ).to(device)
+                self.bbox_predictor(output_channels, num_anchors).to(device)
             )
             self.conf_layers.append(
-                self.class_predictor(
-                    output_channels, num_anchors, num_classes
-                ).to(device)
+                self.class_predictor(output_channels, num_anchors, num_classes).to(
+                    device
+                )
             )
 
     def forward(self, x):
@@ -80,12 +84,9 @@ class SSD(nn.Module):
     def class_predictor(self, out_channels, num_anchors, num_classes):
 
         return nn.Conv2d(
-                out_channels, num_anchors * num_classes, kernel_size=3, padding=1
+            out_channels, num_anchors * num_classes, kernel_size=3, padding=1
         )
 
     def bbox_predictor(self, out_channels, num_anchors):
 
-        return nn.Conv2d(
-            out_channels, num_anchors * 4, kernel_size=3, padding=1
-        )
-
+        return nn.Conv2d(out_channels, num_anchors * 4, kernel_size=3, padding=1)

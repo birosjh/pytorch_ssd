@@ -1,8 +1,6 @@
 import torch
 import yaml
 
-from torch.utils.data import Subset
-
 from datasets.image_dataset import ImageDataset
 from models.ssd import SSD
 from trainer.trainer import Trainer
