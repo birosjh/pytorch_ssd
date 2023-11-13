@@ -1,4 +1,4 @@
-from models.backbone.vgg16 import Vgg16
+from src.models.backbone.vgg16 import Vgg16
 
 
 def backbone_loader(config):

@@ -13,10 +13,10 @@ import torch
 from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
 
-from loggers.log_handler import LogHandler
-from models.loss.ssd import SSDLoss
-from models.metrics.map import MeanAveragePrecision
-from utils.nms import non_maximum_supression
+from src.loggers.log_handler import LogHandler
+from src.models.loss.ssd import SSDLoss
+from src.models.metrics.map import MeanAveragePrecision
+from src.utils.nms import non_maximum_supression
 
 
 class Trainer:

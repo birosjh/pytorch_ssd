@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 
-from utils.nms import non_maximum_supression
+from src.utils.nms import non_maximum_supression
 
 
 class MeanAveragePrecision:

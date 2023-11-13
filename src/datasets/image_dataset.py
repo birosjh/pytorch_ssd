@@ -8,8 +8,8 @@ import torch
 import xmltodict
 from torch.utils.data import Dataset
 
-from datasets.transformations import Transformations
-from utils.data_encoder import DataEncoder
+from src.datasets.transformations import Transformations
+from src.utils.data_encoder import DataEncoder
 
 
 class ImageDataset(Dataset):

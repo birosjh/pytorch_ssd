@@ -4,7 +4,6 @@ logs/
 runs/
 saved_models/
 visualize/*.jpg
-tests/test_data/JPEGImages
-tests/test_data/Annotations
+src/tests/test_data/*
 .vscode
 **/.DS_Store

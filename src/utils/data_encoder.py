@@ -11,7 +11,7 @@ from math import sqrt
 import numpy as np
 import torch
 
-from utils.iou import intersection_over_union
+from src.utils.iou import intersection_over_union
 
 
 class DataEncoder:
