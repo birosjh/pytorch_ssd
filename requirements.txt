@@ -1,5 +1,5 @@
 torch==2.0.0
-torchvision==0.11.2
+torchvision==0.15.1
 imgaug==0.4.0
 opencv-python==4.5.5.64
 xmltodict==0.12.0
