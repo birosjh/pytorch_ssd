@@ -17,7 +17,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry init
+          poetry install
 
       - name: Run linting
         run: poetry run invoke lint
