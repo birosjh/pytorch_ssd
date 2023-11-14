@@ -13,6 +13,7 @@ import torch
 from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
 from torchmetrics.detection import MeanAveragePrecision
+from torchvision.ops import nms
 
 from src.loggers.log_handler import LogHandler
 from src.models.loss.ssd import SSDLoss
@@ -105,15 +106,23 @@ class Trainer:
             # Compute prediction and loss
             confidences, localizations = self.model(images)
 
-            localizations = non_maximum_supression(
-                confidences, localizations, self.iou_threshold, self.device
-            )
+            for conf, loc, target in zip(confidences, localizations, targets):
 
-            conf_loss, loc_loss, loss = self.loss(confidences, localizations, targets)
+                kept = nms(
+                    loc,
+                    conf.max(dim=1).values,
+                    self.iou_threshold
+                )
 
-            epoch_conf_loss += conf_loss.item()
-            epoch_loc_loss += loc_loss.item()
-            epoch_loss += loss.item()
+                conf_loss, loc_loss, loss = self.loss(
+                    conf[kept],
+                    loc[kept],
+                    target[kept]
+                )
+
+                epoch_conf_loss += conf_loss.item()
+                epoch_loc_loss += loc_loss.item()
+                epoch_loss += loss.item()
 
             # Backpropagation
             loss.backward()
@@ -140,17 +149,25 @@ class Trainer:
             for images, targets in tqdm(self.val_dataloader):
                 confidences, localizations = self.model(images)
 
-                localizations = non_maximum_supression(
-                    confidences, localizations, self.iou_threshold, self.device
-                )
+                for conf, loc, target in zip(confidences, localizations, targets):
 
-                conf_loss, loc_loss, loss = self.loss(
-                    confidences, localizations, targets
-                )
+                    kept = nms(
+                        loc,
+                        conf.max(dim=1).values,
+                        self.iou_threshold
+                    )
 
-                epoch_val_conf_loss += conf_loss.item()
-                epoch_val_loc_loss += loc_loss.item()
-                epoch_val_loss += loss.item()
+                    
+
+                    conf_loss, loc_loss, loss = self.loss(
+                        conf[kept],
+                        loc[kept],
+                        target[kept]
+                    )
+
+                    epoch_val_conf_loss += conf_loss.item()
+                    epoch_val_loc_loss += loc_loss.item()
+                    epoch_val_loss += loss.item()
 
                 # TODO: Only pass non-zero predictions (zero is for background)
                 if epoch % self.map_frequency == 0:
