@@ -152,6 +152,7 @@ class Trainer:
                 epoch_val_loc_loss += loc_loss.item()
                 epoch_val_loss += loss.item()
 
+                # TODO: Only pass non-zero predictions (zero is for background)
                 if epoch % self.map_frequency == 0:
                     
                     max_confidences = confidences.max(dim=2)
