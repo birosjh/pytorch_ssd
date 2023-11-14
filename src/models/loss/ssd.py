@@ -19,7 +19,6 @@ class SSDLoss(nn.Module):
         pred_localizations: torch.Tensor,
         targets: torch.Tensor,
     ) -> tuple:
-
         target_confidences = targets[:, -1].type(torch.int32)
         target_localizations = targets[:, 0:-1]
 

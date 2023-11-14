@@ -17,7 +17,6 @@ from torchvision.ops import nms
 
 from src.loggers.log_handler import LogHandler
 from src.models.loss.ssd import SSDLoss
-from src.utils.nms import non_maximum_supression
 
 
 class Trainer:
@@ -107,18 +106,9 @@ class Trainer:
             confidences, localizations = self.model(images)
 
             for conf, loc, target in zip(confidences, localizations, targets):
+                kept = nms(loc, conf.max(dim=1).values, self.iou_threshold)
 
-                kept = nms(
-                    loc,
-                    conf.max(dim=1).values,
-                    self.iou_threshold
-                )
-
-                conf_loss, loc_loss = self.loss(
-                    conf[kept],
-                    loc[kept],
-                    target[kept]
-                )
+                conf_loss, loc_loss = self.loss(conf[kept], loc[kept], target[kept])
 
                 loss = conf_loss + loc_loss
 
@@ -152,18 +142,9 @@ class Trainer:
                 confidences, localizations = self.model(images)
 
                 for conf, loc, target in zip(confidences, localizations, targets):
+                    kept = nms(loc, conf.max(dim=1).values, self.iou_threshold)
 
-                    kept = nms(
-                        loc,
-                        conf.max(dim=1).values,
-                        self.iou_threshold
-                    )
-
-                    conf_loss, loc_loss = self.loss(
-                        conf[kept],
-                        loc[kept],
-                        target[kept]
-                    )
+                    conf_loss, loc_loss = self.loss(conf[kept], loc[kept], target[kept])
 
                     loss = conf_loss + loc_loss
 
