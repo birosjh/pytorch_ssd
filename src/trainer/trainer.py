@@ -12,10 +12,10 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
+from torchmetrics.detection import MeanAveragePrecision
 
 from src.loggers.log_handler import LogHandler
 from src.models.loss.ssd import SSDLoss
-from src.models.metrics.map import MeanAveragePrecision
 from src.utils.nms import non_maximum_supression
 
 
@@ -60,14 +60,15 @@ class Trainer:
 
         self.map_frequency = training_config["map_frequency"]
 
-        self.map = MeanAveragePrecision(
-            train_dataset.classes, device, self.iou_threshold, "coco"
-        )
+        self.map = MeanAveragePrecision()
 
     def train(self) -> None:
         """
         Train the model
         """
+
+        print("Sanity Check")
+        val_records = self.validate_one_epoch(0)
 
         for epoch in range(self.epochs):
             print("Epoch {}/{}".format(epoch, self.epochs - 1))
@@ -133,10 +134,6 @@ class Trainer:
         epoch_val_loc_loss = 0
         epoch_val_loss = 0
 
-        all_confidences = []
-        all_localizations = []
-        all_targets = []
-
         self.model.eval()
 
         with torch.no_grad():
@@ -155,9 +152,28 @@ class Trainer:
                 epoch_val_loc_loss += loc_loss.item()
                 epoch_val_loss += loss.item()
 
-                all_confidences.append(confidences)
-                all_localizations.append(localizations)
-                all_targets.append(targets)
+                if epoch % self.map_frequency == 0:
+                    
+                    max_confidences = confidences.max(dim=2)
+                    max_values = max_confidences.values
+                    max_indices = max_confidences.indices
+
+                    preds = []
+                    ground_truths = []
+
+                    for indices, values, loc, target in zip(max_indices, max_values, localizations, targets):
+
+                        preds.append(dict(
+                            boxes=loc,
+                            scores=values,
+                            labels=indices.type(torch.int32),
+                        ))
+                        ground_truths.append(dict(
+                            boxes=target[:, 0:4],
+                            labels=target[:, 4].type(torch.int32),
+                        ))
+
+                    self.map.update(preds, ground_truths)
 
             records = {
                 "val_conf_loss": epoch_val_conf_loss / len(self.val_dataloader),
@@ -165,13 +181,16 @@ class Trainer:
                 "val_total_loss": epoch_val_loss / len(self.val_dataloader),
             }
 
-            all_confidences = torch.concat(all_confidences)
-            all_localizations = torch.concat(all_localizations)
-            all_targets = torch.concat(all_targets)
-
             if epoch % self.map_frequency == 0:
-                mAP = self.map(all_confidences, all_localizations, all_targets)
-                records["mAP"] = mAP / len(self.val_dataloader)
+
+                metrics = self.map.compute()
+
+                records["map"] = metrics["map"]
+                records["map_50"] = metrics["map_50"]
+                records["map_75"] = metrics["map_75"]
+                records['map_large'] = metrics["map_large"]
+                records['map_medium'] =  metrics["map_medium"]
+                records['map_small'] = metrics["map_small"]
 
         return records
 
