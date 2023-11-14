@@ -71,7 +71,7 @@ class Trainer:
         print("Sanity Check")
         val_records = self.validate_one_epoch(0)
 
-        for epoch in range(self.epochs):
+        for epoch in range(1, self.epochs):
             print("Epoch {}/{}".format(epoch, self.epochs - 1))
             print("-" * 10)
 
@@ -114,11 +114,13 @@ class Trainer:
                     self.iou_threshold
                 )
 
-                conf_loss, loc_loss, loss = self.loss(
+                conf_loss, loc_loss = self.loss(
                     conf[kept],
                     loc[kept],
                     target[kept]
                 )
+
+                loss = conf_loss + loc_loss
 
                 epoch_conf_loss += conf_loss.item()
                 epoch_loc_loss += loc_loss.item()
@@ -157,13 +159,13 @@ class Trainer:
                         self.iou_threshold
                     )
 
-                    
-
-                    conf_loss, loc_loss, loss = self.loss(
+                    conf_loss, loc_loss = self.loss(
                         conf[kept],
                         loc[kept],
                         target[kept]
                     )
+
+                    loss = conf_loss + loc_loss
 
                     epoch_val_conf_loss += conf_loss.item()
                     epoch_val_loc_loss += loc_loss.item()
