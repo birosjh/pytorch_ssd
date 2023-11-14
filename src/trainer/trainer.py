@@ -154,7 +154,6 @@ class Trainer:
 
                 # TODO: Only pass non-zero predictions (zero is for background)
                 if epoch % self.map_frequency == 0:
-                    
                     max_confidences = confidences.max(dim=2)
                     max_values = max_confidences.values
                     max_indices = max_confidences.indices
@@ -162,17 +161,22 @@ class Trainer:
                     preds = []
                     ground_truths = []
 
-                    for indices, values, loc, target in zip(max_indices, max_values, localizations, targets):
-
-                        preds.append(dict(
-                            boxes=loc,
-                            scores=values,
-                            labels=indices.type(torch.int32),
-                        ))
-                        ground_truths.append(dict(
-                            boxes=target[:, 0:4],
-                            labels=target[:, 4].type(torch.int32),
-                        ))
+                    for indices, values, loc, target in zip(
+                        max_indices, max_values, localizations, targets
+                    ):
+                        preds.append(
+                            dict(
+                                boxes=loc,
+                                scores=values,
+                                labels=indices.type(torch.int32),
+                            )
+                        )
+                        ground_truths.append(
+                            dict(
+                                boxes=target[:, 0:4],
+                                labels=target[:, 4].type(torch.int32),
+                            )
+                        )
 
                     self.map.update(preds, ground_truths)
 
@@ -183,15 +187,14 @@ class Trainer:
             }
 
             if epoch % self.map_frequency == 0:
-
                 metrics = self.map.compute()
 
                 records["map"] = metrics["map"]
                 records["map_50"] = metrics["map_50"]
                 records["map_75"] = metrics["map_75"]
-                records['map_large'] = metrics["map_large"]
-                records['map_medium'] =  metrics["map_medium"]
-                records['map_small'] = metrics["map_small"]
+                records["map_large"] = metrics["map_large"]
+                records["map_medium"] = metrics["map_medium"]
+                records["map_small"] = metrics["map_small"]
 
         return records
 
