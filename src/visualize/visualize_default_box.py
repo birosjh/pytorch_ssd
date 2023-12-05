@@ -6,19 +6,7 @@ import imgaug.augmenters as iaa
 import yaml
 from imgaug.augmentables.bbs import BoundingBox, BoundingBoxesOnImage
 
-from utils.data_encoder import DataEncoder
-
-
-def load_configurations():
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument("--config", action="store", required=True)
-    arguments = parser.parse_args()
-
-    with open(arguments.config) as file:
-        config = yaml.safe_load(file)
-
-    return config
+from src.utils.data_encoder import DataEncoder
 
 
 def get_box_groups(encoder_config, default_boxes):
@@ -42,13 +30,14 @@ def get_box_groups(encoder_config, default_boxes):
     return box_groups
 
 
-def main():
-    config = load_configurations()
+def visualize_default_box(config_file):
+    with open(config_file) as file:
+        config = yaml.safe_load(file)
 
-    encoder_config = config["simple_model_configuration"]
-    data_encoder = DataEncoder(encoder_config)
+    model_config = config["model_configuration"]
+    data_encoder = DataEncoder(model_config)
 
-    image_path = "data/val_images/000000086220.jpg"
+    image_path = "data/JPEGImages/2010_001718.jpg"
     image = cv2.imread(image_path)
 
     aug = iaa.Resize({"height": 300, "width": 300})
@@ -57,11 +46,11 @@ def main():
 
     default_boxes = data_encoder.default_boxes
 
-    box_groups = get_box_groups(encoder_config, default_boxes)
+    box_groups = get_box_groups(model_config, default_boxes)
 
-    set_of_boxes = random.choice(box_groups[10])
+    set_of_boxes = random.choice(box_groups[1])
 
-    set_of_boxes = set_of_boxes * 300
+    set_of_boxes = set_of_boxes
 
     print(set_of_boxes)
 
@@ -78,4 +67,10 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--config", action="store", required=True)
+    arguments = parser.parse_args()
+
+    visualize_default_box(arguments.config)
