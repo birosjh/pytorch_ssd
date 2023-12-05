@@ -33,11 +33,11 @@ def train_model(config_path: str) -> None:
     data_encoder = DataEncoder(model_config)
 
     train_dataset = ImageDataset(
-        data_config=data_config, data_encoder=data_encoder, mode="train", device=device
+        data_config=data_config, data_encoder=data_encoder, mode="train"
     )
 
     val_dataset = ImageDataset(
-        data_config=data_config, data_encoder=data_encoder, mode="val", device=device
+        data_config=data_config, data_encoder=data_encoder, mode="val"
     )
 
     num_classes = len(data_config["classes"]) + 1
