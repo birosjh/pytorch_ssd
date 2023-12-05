@@ -6,8 +6,8 @@ import numpy as np
 import yaml
 from torch.utils.data import DataLoader
 
-from datasets.image_dataset import ImageDataset
-from utils.data_encoder import DataEncoder
+from src.datasets.image_dataset import ImageDataset
+from src.utils.data_encoder import DataEncoder
 
 BOX_COLOR = (0, 0, 0)
 TEXT_COLOR = (0, 0, 0)
@@ -115,7 +115,7 @@ def visualize_batch(config_path: str, val: bool = False) -> None:
     for image, labelset in zip(images, labels):
         np_image = image.permute(1, 2, 0).numpy().copy().astype(np.uint8)
 
-        np_labels = labelset[labelset[:, -1] > 0].numpy().astype(int)
+        np_labels = labelset[labelset[:, -1] > 0].numpy().astype(int) - 1
 
         for label in np_labels:
             np_image = visualize_bbox(
@@ -126,6 +126,6 @@ def visualize_batch(config_path: str, val: bool = False) -> None:
 
     batch_image = cv2.vconcat(bbs_applied_images)
 
-    file_name = Path("visualize") / "visualized_batch.jpg"
+    file_name = Path("src/visualize") / "visualized_batch.jpg"
 
     cv2.imwrite(str(file_name.absolute()), batch_image)
