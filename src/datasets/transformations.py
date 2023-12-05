@@ -11,20 +11,28 @@ class Transformations:
     """
 
     def __init__(self, config: dict, mode: str) -> None:
+        transforms = []
+        
         if config["transform"] and mode == "train":
-            self.transform = A.Compose(
-                [
-                    A.HorizontalFlip(p=0.5),
-                    A.RandomBrightnessContrast(p=0.5),
-                    A.Resize(config["figure_size"], config["figure_size"]),
-                ],
-                bbox_params=A.BboxParams(format="pascal_voc"),
+            transforms.append(A.HorizontalFlip(p=0.5))
+            transforms.append(A.RandomBrightnessContrast(p=0.5))
+
+
+        if config["normalize"]:
+            transforms.append(
+                A.Normalize(
+                    mean=[0.485, 0.456, 0.406],
+                    std=[0.229, 0.224, 0.225],
+                    always_apply=True
+                )
             )
-        else:
-            self.transform = A.Compose(
-                [A.Resize(config["figure_size"], config["figure_size"])],
-                bbox_params=A.BboxParams(format="pascal_voc"),
-            )
+
+        transforms.append(A.Resize(config["figure_size"], config["figure_size"]))
+
+        self.transform = A.Compose(
+            transforms,
+            bbox_params=A.BboxParams(format="pascal_voc"),
+        )
 
     def __call__(self, image: np.ndarray, bounding_boxes: list) -> Any:
         """
