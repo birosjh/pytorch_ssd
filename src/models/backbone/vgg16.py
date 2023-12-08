@@ -44,11 +44,10 @@ class VGG16(nn.Module):
 
     def block_2(self):
         block = nn.Sequential(
-            torch.nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1),
-            torch.nn.ReLU(),
-            torch.nn.Conv2d(512, 512, kernel_size=1, stride=1, padding=0),
-            torch.nn.ReLU(),
-            torch.nn.MaxPool2d(kernel_size=2)
+            nn.Conv2d(512, 256, kernel_size=1),
+            nn.ReLU(),
+            nn.Conv2d(256, 512, kernel_size=3, padding=1, stride=2),
+            nn.ReLU(),
         )
         
         block.apply(initialize)
@@ -57,11 +56,10 @@ class VGG16(nn.Module):
     
     def block_3(self):
         block =  nn.Sequential(
-            torch.nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1),
-            torch.nn.ReLU(),
-            torch.nn.Conv2d(512, 512, kernel_size=1, stride=1, padding=0),
-            torch.nn.ReLU(),
-            torch.nn.MaxPool2d(kernel_size=2)
+            nn.Conv2d(512, 128, kernel_size=1),
+            nn.ReLU(),
+            nn.Conv2d(128, 256, kernel_size=3, padding=1, stride=2),
+            nn.ReLU(),
         )
 
         block.apply(initialize)
@@ -70,11 +68,10 @@ class VGG16(nn.Module):
     
     def block_4(self):
         block = nn.Sequential(
-            torch.nn.Conv2d(512, 1024, kernel_size=3, stride=1, padding=1),
-            torch.nn.ReLU(),
-            torch.nn.Conv2d(1024, 1024, kernel_size=1, stride=1, padding=0),
-            torch.nn.ReLU(),
-            torch.nn.MaxPool2d(kernel_size=2)
+            nn.Conv2d(256, 128, kernel_size=1),
+            nn.ReLU(),
+            nn.Conv2d(128, 256, kernel_size=3),
+            nn.ReLU(),
         )
 
         block.apply(initialize)
@@ -83,11 +80,10 @@ class VGG16(nn.Module):
     
     def block_5(self):
         block = nn.Sequential(
-            torch.nn.Conv2d(1024, 1024, kernel_size=3, stride=1, padding=1),
-            torch.nn.ReLU(),
-            torch.nn.Conv2d(1024, 1024, kernel_size=1, stride=1, padding=0),
-            torch.nn.ReLU(),
-            torch.nn.MaxPool2d(kernel_size=2)
+            nn.Conv2d(256, 128, kernel_size=1),
+            nn.ReLU(),
+            nn.Conv2d(128, 256, kernel_size=3),
+            nn.ReLU(),
         )
 
         block.apply(initialize)
@@ -96,15 +92,14 @@ class VGG16(nn.Module):
     
     def block_6(self):
         block =  nn.Sequential(
-            torch.nn.Conv2d(1024, 2048, kernel_size=3, stride=1, padding=1),
-            torch.nn.ReLU(),
-            torch.nn.Conv2d(2048, 2048, kernel_size=1, stride=1, padding=0),
-            torch.nn.ReLU(),
-            torch.nn.MaxPool2d(kernel_size=2)
-        )
+            nn.Conv2d(256, 128, kernel_size=1),
+            nn.ReLU(),
+            nn.Conv2d(128, 256, kernel_size=4),
+            nn.ReLU(),
+)
 
         return block
     
     def output_channels(self):
 
-        return [512, 512, 512, 1024, 1024, 2048]
+        return [512, 512, 256, 256, 256, 256]
