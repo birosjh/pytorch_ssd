@@ -17,9 +17,9 @@ def infer(c, image_filename, output_filename, filename="src/configs/config.yaml"
 
 @task
 def visualize_a_batch(c, filename="src/configs/config.yaml", use_val=False):
-    from src.visualize.visualize_batch import visualize_batch
+    from src.visualize.visualize_batch import visualize_a_batch
 
-    visualize_batch(filename, use_val)
+    visualize_a_batch(filename, use_val)
 
 @task
 def visualize_default_box(c, filename="src/configs/config.yaml"):
