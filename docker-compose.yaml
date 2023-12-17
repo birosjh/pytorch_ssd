@@ -2,6 +2,7 @@ version: "3.9"
 services:
   app:
     build: .
+    shm_size: '2gb'
     tty: True
     ports:
       - "8000:5000"
