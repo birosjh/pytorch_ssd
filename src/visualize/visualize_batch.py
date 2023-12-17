@@ -1,13 +1,15 @@
 from pathlib import Path
+import argparse
 
 import cv2
 import matplotlib.cm as cm
 import numpy as np
 import yaml
 from torch.utils.data import DataLoader
+from torchvision.ops import box_iou
 
-from datasets.image_dataset import ImageDataset
-from utils.data_encoder import DataEncoder
+from src.datasets.image_dataset import ImageDataset
+from src.utils.data_encoder import DataEncoder
 
 BOX_COLOR = (0, 0, 0)
 TEXT_COLOR = (0, 0, 0)
@@ -72,7 +74,7 @@ def visualize_bbox(
     return image
 
 
-def visualize_batch(config_path: str, val: bool = False) -> None:
+def visualize_batch(images, labels, classes, targets=None) -> None:
     """
     Visualize a batch of images exactly as they are returned from the dataloader
     This includes any transformations that may have been performed
@@ -83,7 +85,46 @@ def visualize_batch(config_path: str, val: bool = False) -> None:
             Defaults to False.
     """
 
-    with open(config_path) as file:
+    bbs_applied_images = []
+
+    cmap = cm.viridis
+    color_list = cmap(range(len(classes)))
+
+    target_cmap = cm.spring
+    target_color_list = target_cmap(range(len(classes)))
+
+    for idx, (image, labelset) in enumerate(zip(images, labels)):
+
+        if targets is not None:
+
+            object_exists = (targets[idx][:, -1] > 0)
+
+            # Find Positive Matches Between Preds and Targets
+
+            np_labels = labelset[object_exists].numpy().astype(int)
+        else:
+            np_labels = labelset[labelset[:, -1] > 0].numpy().astype(int)
+
+        np_labels[:, -1] -= 1
+
+        np_image = image.permute(1, 2, 0).numpy().copy().astype(np.uint8)
+
+        for label in np_labels:
+            np_image = visualize_bbox(
+                np_image, label, color_list, classes
+            )
+
+        bbs_applied_images.append(np_image)
+
+    batch_image = cv2.vconcat(bbs_applied_images)
+
+    file_name = Path("src/visualize") / "visualized_batch.jpg"
+
+    cv2.imwrite(str(file_name.absolute()), batch_image)
+
+def visualize_a_batch(config, val):
+
+    with open(config) as file:
         config = yaml.safe_load(file)
 
     model_config = config["model_configuration"]
@@ -107,25 +148,20 @@ def visualize_batch(config_path: str, val: bool = False) -> None:
 
     images, labels = next(iter(dataloader))
 
-    bbs_applied_images = []
+    classes = data_config["classes"]
 
-    cmap = cm.viridis
-    color_list = cmap(range(len(data_config["classes"])))
+    visualize_batch(images, labels, classes)
 
-    for image, labelset in zip(images, labels):
-        np_image = image.permute(1, 2, 0).numpy().copy().astype(np.uint8)
 
-        np_labels = labelset[labelset[:, -1] > 0].numpy().astype(int)
+if __name__ == "__main__":
 
-        for label in np_labels:
-            np_image = visualize_bbox(
-                np_image, label, color_list, data_config["classes"]
-            )
+    parser = argparse.ArgumentParser()
 
-        bbs_applied_images.append(np_image)
+    parser.add_argument("--config", action="store", required=True)
+    parser.add_argument("--val", action="store", required=True)
+    arguments = parser.parse_args()
 
-    batch_image = cv2.vconcat(bbs_applied_images)
+    visualize_a_batch(arguments.config, arguments.val)
 
-    file_name = Path("visualize") / "visualized_batch.jpg"
+    
 
-    cv2.imwrite(str(file_name.absolute()), batch_image)

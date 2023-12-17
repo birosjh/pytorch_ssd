@@ -10,7 +10,7 @@ class LocalizationLoss(nn.Module):
     def __init__(self):
         super(LocalizationLoss, self).__init__()
 
-        self.smooth_l1 = nn.SmoothL1Loss()
+        self.smooth_l1 = nn.SmoothL1Loss(reduction="sum")
 
     def forward(self, predictions, targets):
         # As specified in the SSD paper, set to zero when no

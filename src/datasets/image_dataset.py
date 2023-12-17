@@ -23,7 +23,6 @@ class ImageDataset(Dataset):
         data_encoder: DataEncoder,
         mode: str = "train",
         visualize: bool = False,
-        device: str = "cpu",
         iou_threshold: float = 0.5,
     ):
         self.visualize = visualize
@@ -44,8 +43,6 @@ class ImageDataset(Dataset):
         self.data_encoder = data_encoder
         self.default_boxes = self.data_encoder.default_boxes
 
-        self.device = device
-
         self.iou_threshold = iou_threshold
 
     def __len__(self):
@@ -62,7 +59,10 @@ class ImageDataset(Dataset):
         labels = self.load_labels_from_annotation(filename)
 
         # Perform transformations on the data
-        transformed_data = self.transformations(image=image, bounding_boxes=labels)
+        transformed_data = self.transformations(
+            image=image,
+            bounding_boxes=labels,
+        )
 
         image = transformed_data["image"]
         labels = transformed_data["bboxes"]
@@ -70,23 +70,18 @@ class ImageDataset(Dataset):
         image = torch.Tensor(image)
         label_tensor = torch.Tensor(labels)
 
-        bounding_boxes = label_tensor[:, 0:4]
-        labels_in = label_tensor[:, 4]
+        # Zero is for background
+        label_tensor[:,-1] += 1
 
-        encoded_boxes, labels_out = self.data_encoder.encode(
-            bounding_boxes, labels_in, self.iou_threshold
-        )
-
-        # Rejoin the encoded boxes and labels
-        label_tensor = torch.cat((encoded_boxes, labels_out.unsqueeze(1)), 1).to(
-            self.device
+        label_tensor = self.data_encoder.encode(
+            label_tensor,
+            self.iou_threshold
         )
 
         if self.visualize:
             return (image, label_tensor)
-
-        # This seems bad, but I will revist it later when I check for bottlenecks
-        image = image.permute(2, 0, 1).to(self.device)
+        
+        image = image.permute(2, 0, 1)
 
         return (image, label_tensor)
 
@@ -161,4 +156,4 @@ class ImageDataset(Dataset):
                 ]
             )
 
-        return labels
+        return torch.tensor(labels)

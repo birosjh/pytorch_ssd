@@ -1,10 +1,10 @@
 model_configuration:
     backbone: "vgg16"
-    pretrained: False
+    pretrained: True
     figure_size: 256
-    feature_map_sizes: [32, 16, 8, 4, 2, 1]
-    steps: [8, 16, 32, 64, 100, 300]
-    scales: [30, 60, 111, 162, 213, 264, 315]
+    feature_map_sizes: [32, 16, 8, 6, 4, 1]
+    steps: [8, 16, 32, 64, 128, 256]
+    scales: [26, 51, 95, 138, 182, 225, 269]
     aspect_ratios: [[2], [2,3], [2,3], [2,3], [2], [2]]
 
 training_configuration:
@@ -13,12 +13,12 @@ training_configuration:
         textfile: True
     learning_rate: 0.0001
     alpha: 0.9
-    batch_size: 4
-    epochs: 11
-    num_workers: 0
+    batch_size: 32
+    epochs: 40
+    num_workers: 4
     model_save_path: "saved_models"
     iou_threshold: 0.5
-    map_frequency: 5 # How often to run map calculation
+    map_frequency: 10 # How often to run map calculation
 
 data_configuration:
     train: "./data/train_sample.txt"
@@ -29,7 +29,8 @@ data_configuration:
 
     transformations:
         figure_size: 256 # Regardless of transform settings this will be applied
-        transform: True
+        transform: False
+        normalize: True
 
 inference_configuration:
     model_path: "saved_models/best_model.pth"

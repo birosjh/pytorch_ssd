@@ -17,6 +17,7 @@ from torchvision.ops import nms
 
 from src.loggers.log_handler import LogHandler
 from src.models.loss.ssd import SSDLoss
+from src.visualize.visualize_batch import visualize_batch
 
 
 class Trainer:
@@ -26,14 +27,17 @@ class Trainer:
     """
 
     def __init__(
-        self, model, train_dataset, val_dataset, training_config, device
+        self, model, train_dataset, val_dataset, training_config, device,
     ) -> None:
         self.model = model.to(device)
 
+        print(self.model)
+        
         self.train_dataloader = DataLoader(
             train_dataset,
             batch_size=training_config["batch_size"],
             num_workers=training_config["num_workers"],
+            shuffle=True
         )
 
         self.val_dataloader = DataLoader(
@@ -43,32 +47,40 @@ class Trainer:
         )
 
         self.optimizer = torch.optim.SGD(
-            model.parameters(), lr=training_config["learning_rate"]
+            model.parameters(),
+            lr=training_config["learning_rate"],
+            momentum=0.9
         )
 
-        self.loss = SSDLoss(alpha=training_config["alpha"])
+        self.loss = SSDLoss(
+            training_config["alpha"],
+            training_config["iou_threshold"],
+            device,
+            train_dataset.data_encoder
+        )
+
+        self.batch_size = training_config["batch_size"]
 
         self.epochs = training_config["epochs"]
         self.log = LogHandler(training_config["loggers"])
         self.save_path = Path(training_config["model_save_path"])
         self.save_path.mkdir(parents=True, exist_ok=True)
 
-        self.label_indices = np.arange(1, len(train_dataset.classes) + 1)
-
-        self.iou_threshold = training_config["iou_threshold"]
+        self.classes = train_dataset.classes
+        self.label_indices = np.arange(1, len(self.classes) + 1)
+        
         self.device = device
 
         self.map_frequency = training_config["map_frequency"]
 
         self.map = MeanAveragePrecision()
 
+        self.lowest_validation_loss = 100000000.0
+
     def train(self) -> None:
         """
         Train the model
         """
-
-        print("Sanity Check")
-        val_records = self.validate_one_epoch(0)
 
         for epoch in range(1, self.epochs):
             print("Epoch {}/{}".format(epoch, self.epochs - 1))
@@ -102,23 +114,32 @@ class Trainer:
         for images, targets in tqdm(self.train_dataloader):
             self.optimizer.zero_grad()
 
+            images = images.to(self.device)
+            targets = targets.to(self.device)
+
             # Compute prediction and loss
             confidences, localizations = self.model(images)
 
-            for conf, loc, target in zip(confidences, localizations, targets):
-                kept = nms(loc, conf.max(dim=1).values, self.iou_threshold)
-
-                conf_loss, loc_loss = self.loss(conf[kept], loc[kept], target[kept])
-
-                loss = conf_loss + loc_loss
-
-                epoch_conf_loss += conf_loss.item()
-                epoch_loc_loss += loc_loss.item()
-                epoch_loss += loss.item()
+            loss, breakdown = self.loss(confidences, localizations, targets)
 
             # Backpropagation
-            loss.backward()
-            self.optimizer.step()
+            if loss > 0:
+                loss.backward()
+                self.optimizer.step()
+
+            epoch_conf_loss += breakdown["conf"]
+            epoch_loc_loss += breakdown["loc"]
+            epoch_loss += loss.item()
+
+        labels = confidences.argmax(dim=2).unsqueeze(2)
+        predictions = torch.concat([localizations, labels], dim=2)
+
+        visualize_batch(
+            images.cpu().detach(),
+            predictions.cpu().detach(),
+            self.classes,
+            targets.cpu().detach()
+        )
 
         return {
             "train_conf_loss": epoch_conf_loss / len(self.train_dataloader),
@@ -139,18 +160,16 @@ class Trainer:
 
         with torch.no_grad():
             for images, targets in tqdm(self.val_dataloader):
+                images = images.to(self.device)
+                targets = targets.to(self.device)
+
                 confidences, localizations = self.model(images)
 
-                for conf, loc, target in zip(confidences, localizations, targets):
-                    kept = nms(loc, conf.max(dim=1).values, self.iou_threshold)
+                loss, breakdown = self.loss(confidences, localizations, targets)
 
-                    conf_loss, loc_loss = self.loss(conf[kept], loc[kept], target[kept])
-
-                    loss = conf_loss + loc_loss
-
-                    epoch_val_conf_loss += conf_loss.item()
-                    epoch_val_loc_loss += loc_loss.item()
-                    epoch_val_loss += loss.item()
+                epoch_val_conf_loss += breakdown["conf"]
+                epoch_val_loc_loss += breakdown["loc"]
+                epoch_val_loss += loss.item()
 
                 # TODO: Only pass non-zero predictions (zero is for background)
                 if epoch % self.map_frequency == 0:
@@ -164,17 +183,20 @@ class Trainer:
                     for indices, values, loc, target in zip(
                         max_indices, max_values, localizations, targets
                     ):
+                        
+                        object_indices = (target[:, -1].type(torch.int32) > 0)
+
                         preds.append(
                             dict(
-                                boxes=loc,
-                                scores=values,
-                                labels=indices.type(torch.int32),
+                                boxes=loc[object_indices],
+                                scores=values[object_indices],
+                                labels=indices[object_indices].type(torch.int32),
                             )
                         )
                         ground_truths.append(
                             dict(
-                                boxes=target[:, 0:4],
-                                labels=target[:, 4].type(torch.int32),
+                                boxes=target[:, 0:4][object_indices],
+                                labels=target[:, 4][object_indices].type(torch.int32),
                             )
                         )
 

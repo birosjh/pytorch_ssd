@@ -3,7 +3,7 @@ data/
 logs/
 runs/
 saved_models/
-visualize/*.jpg
+src/visualize/*.jpg
 src/tests/test_data/*
 .vscode
 **/.DS_Store
