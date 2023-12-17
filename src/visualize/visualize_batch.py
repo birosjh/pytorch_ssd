@@ -85,6 +85,10 @@ def visualize_batch(images, labels, classes, targets=None) -> None:
             Defaults to False.
     """
 
+    if targets is not None:
+
+        classes = ["background"] + list(classes)
+
     bbs_applied_images = []
 
     cmap = cm.viridis
@@ -102,10 +106,10 @@ def visualize_batch(images, labels, classes, targets=None) -> None:
             # Find Positive Matches Between Preds and Targets
 
             np_labels = labelset[object_exists].numpy().astype(int)
+
         else:
             np_labels = labelset[labelset[:, -1] > 0].numpy().astype(int)
 
-        np_labels[:, -1] -= 1
 
         np_image = image.permute(1, 2, 0).numpy().copy().astype(np.uint8)
 

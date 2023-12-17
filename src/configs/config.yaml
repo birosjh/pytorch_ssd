@@ -29,7 +29,7 @@ data_configuration:
 
     transformations:
         figure_size: 256 # Regardless of transform settings this will be applied
-        transform: False
+        transform: True
         normalize: True
 
 inference_configuration:
