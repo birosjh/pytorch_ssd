@@ -11,8 +11,7 @@ from math import sqrt
 import numpy as np
 import torch
 
-from src.utils.iou import intersection_over_union
-
+from torchvision.ops import box_iou
 
 class DataEncoder:
     def __init__(self, default_box_config):
@@ -69,11 +68,15 @@ class DataEncoder:
 
         return dboxes_ltrb
 
-    def encode(self, bounding_boxes, labels_in, criteria: float = 0.5) -> torch.Tensor:
+    def encode(self, ground_truth, criteria) -> torch.Tensor:
+
+        bounding_boxes = ground_truth[:, 0:4]
+        labels_in = ground_truth[:, -1]
+
         num_default_boxes = self.default_boxes.size(0)
 
         # Returns a matrix of ious for each bbox and each dbox
-        ious = intersection_over_union(bounding_boxes, self.default_boxes)
+        ious = box_iou(bounding_boxes, self.default_boxes)
 
         # Get the values and indices of the best bbox ious for dboxes
         best_dbox_ious, best_dbox_idx = ious.max(0)
@@ -98,4 +101,52 @@ class DataEncoder:
             best_dbox_idx[passes_criteria], :
         ]
 
-        return encoded_boxes, labels_out
+        # encoded_boxes = self.normalize(encoded_boxes)
+
+        encoded_ground_truth = torch.cat([encoded_boxes, labels_out.unsqueeze(dim=1)], dim=1)
+
+        return encoded_ground_truth
+    
+    def normalize(self, boxes, device=None):
+
+        normalized_boxes = boxes.clone()
+
+        default_boxes = self.default_boxes.clone()
+
+        if device is not None:
+        
+            default_boxes = default_boxes.to(device)
+
+        normalized_boxes[:, 0] -= default_boxes[:, 0]
+        normalized_boxes[:, 1] -= default_boxes[:, 1]
+        normalized_boxes[:, 2] -= default_boxes[:, 2]
+        normalized_boxes[:, 3] -= default_boxes[:, 3]
+
+        normalized_boxes[:, 0] /= default_boxes[:, 2] - default_boxes[:, 0]
+        normalized_boxes[:, 1] /= default_boxes[:, 3] - default_boxes[:, 1]
+        normalized_boxes[:, 2] /= default_boxes[:, 2] - default_boxes[:, 0]
+        normalized_boxes[:, 3] /= default_boxes[:, 3] - default_boxes[:, 1]
+
+        return normalized_boxes
+    
+    def denormalize(self, boxes, device=None):
+
+        denormalized_boxes = boxes.clone()
+
+        default_boxes = self.default_boxes.clone()
+
+        if device is not None:
+        
+            default_boxes = default_boxes.to(device)
+
+        denormalized_boxes[:, 0] *= default_boxes[:, 2] - default_boxes[:, 0]
+        denormalized_boxes[:, 1] *= default_boxes[:, 3] - default_boxes[:, 1]
+        denormalized_boxes[:, 2] *= default_boxes[:, 2] - default_boxes[:, 0]
+        denormalized_boxes[:, 3] *= default_boxes[:, 3] - default_boxes[:, 1]
+
+        denormalized_boxes[:, 0] += default_boxes[:, 0]
+        denormalized_boxes[:, 1] += default_boxes[:, 1]
+        denormalized_boxes[:, 2] += default_boxes[:, 2]
+        denormalized_boxes[:, 3] += default_boxes[:, 3]
+
+        return boxes

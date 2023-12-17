@@ -40,7 +40,7 @@ def visualize_default_box(config_file):
     image_path = "data/JPEGImages/2010_001718.jpg"
     image = cv2.imread(image_path)
 
-    aug = iaa.Resize({"height": 300, "width": 300})
+    aug = iaa.Resize({"height": 256, "width": 256})
 
     resized_image = aug(image=image)
 
@@ -48,7 +48,9 @@ def visualize_default_box(config_file):
 
     box_groups = get_box_groups(model_config, default_boxes)
 
-    set_of_boxes = random.choice(box_groups[1])
+    print(box_groups.keys())
+
+    set_of_boxes = random.choice(box_groups[32])
 
     set_of_boxes = set_of_boxes
 
