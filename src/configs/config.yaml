@@ -12,6 +12,8 @@ training_configuration:
         tensorboard: True
         textfile: True
     learning_rate: 0.0001
+    momentum: 0.9
+    weight_decay: 0.0005
     alpha: 0.9
     batch_size: 32
     epochs: 40

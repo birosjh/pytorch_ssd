@@ -20,19 +20,14 @@ class SSD(nn.Module):
         config: dict,
         num_classes: int,
         data_encoder: DataEncoder,
-        device: str,
-        encode: bool = True,
     ) -> None:
         # Always have to do this when making a new model
         super(SSD, self).__init__()
 
-        self.feature_map_extractor = backbone_loader(config).to(device)
+        self.feature_map_extractor = backbone_loader(config)
         self.num_classes = num_classes
 
-        self.device = device
-
         self.data_encoder = data_encoder
-        self.encode = encode
 
         self.loc_layers = nn.ModuleList([])
         self.conf_layers = nn.ModuleList([])
@@ -45,12 +40,10 @@ class SSD(nn.Module):
 
         for num_anchors, output_channels in zip(num_defaults_per_cell, output_channels):
             self.loc_layers.append(
-                self.bbox_predictor(output_channels, num_anchors).to(device)
+                self.bbox_predictor(output_channels, num_anchors)
             )
             self.conf_layers.append(
-                self.class_predictor(output_channels, num_anchors, num_classes).to(
-                    device
-                )
+                self.class_predictor(output_channels, num_anchors, num_classes)
             )
 
     def forward(self, x):
@@ -97,9 +90,9 @@ class SSD(nn.Module):
         return loc_head
 
     def convert_to_box(self, loc):
-        default_boxes = self.data_encoder.default_boxes.to(self.device)
+        default_boxes = self.data_encoder.default_boxes.to(loc.device)
 
-        new_locs = torch.zeros(loc.shape).to(self.device)
+        new_locs = torch.zeros(loc.shape).to(loc.device)
 
         for idx in range(loc.shape[0]):
             new_locs[idx][:, 0] = loc[idx][:, 0] * (

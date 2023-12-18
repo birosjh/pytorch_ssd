@@ -7,7 +7,7 @@ import numpy as np
 import yaml
 from torch.utils.data import DataLoader
 
-from src.datasets.image_dataset import ImageDataset
+from src.datamodules.datasets.image_dataset import ImageDataset
 from src.utils.data_encoder import DataEncoder
 
 BOX_COLOR = (0, 0, 0)

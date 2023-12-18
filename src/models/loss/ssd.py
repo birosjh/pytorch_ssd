@@ -6,7 +6,7 @@ from torchvision.ops import generalized_box_iou_loss
 
 
 class SSDLoss(nn.Module):
-    def __init__(self, alpha, iou_threshold, device, data_encoder) -> None:
+    def __init__(self, alpha, iou_threshold, data_encoder) -> None:
         super(SSDLoss, self).__init__()
 
         self.confidence_loss = nn.CrossEntropyLoss(reduction="none")
@@ -14,7 +14,6 @@ class SSDLoss(nn.Module):
 
         self.alpha = alpha
         self.iou_threshold = iou_threshold
-        self.device = device
         self.data_encoder = data_encoder
 
     def forward_per_item(
@@ -75,7 +74,7 @@ class SSDLoss(nn.Module):
         # Calculate Negative Confidence Losses
         unsorted_negative_confidence_losses = self.confidence_loss(
             unmatched_confidences,
-            torch.zeros(unmatched_confidences.shape[0], dtype=int).to(self.device),
+            torch.zeros(unmatched_confidences.shape[0], dtype=int).to(unmatched_confidences.device)
         )
         negative_confidence_losses = unsorted_negative_confidence_losses.sort(
             descending=True
