@@ -39,27 +39,16 @@ def train_model(config_path: str) -> None:
 
     data_encoder = DataEncoder(model_config)
 
-    datamodule = PascalDataModule(
-        data_config,
-        training_config,
-        data_encoder
-    )
+    datamodule = PascalDataModule(data_config, training_config, data_encoder)
 
-    model = LightningSSD(
-        model_config,
-        training_config,
-        data_encoder,
-        num_classes
-    )
+    model = LightningSSD(model_config, training_config, data_encoder, num_classes)
 
     trainer = L.Trainer(
         max_epochs=30,
         accelerator="auto",
         devices=1 if device != "cpu" else None,
         logger=[CSVLogger(save_dir="logs/"), WandbLogger(project="SSD")],
-        callbacks=[
-            LearningRateMonitor(logging_interval="epoch")
-        ],
+        callbacks=[LearningRateMonitor(logging_interval="epoch")],
     )
 
     trainer.fit(model, datamodule)

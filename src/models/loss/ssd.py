@@ -74,7 +74,9 @@ class SSDLoss(nn.Module):
         # Calculate Negative Confidence Losses
         unsorted_negative_confidence_losses = self.confidence_loss(
             unmatched_confidences,
-            torch.zeros(unmatched_confidences.shape[0], dtype=int).to(unmatched_confidences.device)
+            torch.zeros(unmatched_confidences.shape[0], dtype=int).to(
+                unmatched_confidences.device
+            ),
         )
         negative_confidence_losses = unsorted_negative_confidence_losses.sort(
             descending=True

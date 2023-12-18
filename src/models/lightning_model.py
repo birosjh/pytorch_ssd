@@ -7,7 +7,6 @@ from torchmetrics.detection import MeanAveragePrecision
 
 
 class LightningSSD(L.LightningModule):
-
     def __init__(self, model_config, training_config, data_encoder, num_classes):
         super().__init__()
 
@@ -28,12 +27,9 @@ class LightningSSD(L.LightningModule):
         self.map = MeanAveragePrecision()
 
     def forward(self, x):
-
         return self.model(x)
 
-        
     def training_step(self, batch, batch_idx):
-
         images, targets = batch
 
         confidences, localizations = self(images)
@@ -43,16 +39,14 @@ class LightningSSD(L.LightningModule):
         records = {
             "loss": loss,
             "confidence_loss": breakdown["conf"],
-            "localization_loss": breakdown["loc"]
+            "localization_loss": breakdown["loc"],
         }
 
         self.log_dict(records)
 
         return records
-    
 
     def evaluate(self, batch, batch_idx, stage=None):
-
         images, targets = batch
 
         confidences, localizations = self(images)
@@ -62,7 +56,7 @@ class LightningSSD(L.LightningModule):
         records = {
             "loss": loss,
             "confidence_loss": breakdown["conf"],
-            "localization_loss": breakdown["loc"]
+            "localization_loss": breakdown["loc"],
         }
 
         if batch_idx % self.map_frequency == 0 and batch_idx > 0:
@@ -90,8 +84,7 @@ class LightningSSD(L.LightningModule):
             self.parameters(),
             lr=self.lr,
             momentum=self.momentum,
-            weight_decay=self.weight_decay
-
+            weight_decay=self.weight_decay,
         )
 
-        return { "optimizer": optimizer }
+        return {"optimizer": optimizer}
