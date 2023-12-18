@@ -6,7 +6,6 @@ import matplotlib.cm as cm
 import numpy as np
 import yaml
 from torch.utils.data import DataLoader
-from torchvision.ops import box_iou
 
 from src.datasets.image_dataset import ImageDataset
 from src.utils.data_encoder import DataEncoder
@@ -85,34 +84,29 @@ def visualize_batch(images, labels, classes, targets=None) -> None:
             Defaults to False.
     """
 
+    if targets is not None:
+        classes = ["background"] + list(classes)
+
     bbs_applied_images = []
 
     cmap = cm.viridis
     color_list = cmap(range(len(classes)))
 
-    target_cmap = cm.spring
-    target_color_list = target_cmap(range(len(classes)))
-
     for idx, (image, labelset) in enumerate(zip(images, labels)):
-
         if targets is not None:
-
-            object_exists = (targets[idx][:, -1] > 0)
+            object_exists = targets[idx][:, -1] > 0
 
             # Find Positive Matches Between Preds and Targets
 
             np_labels = labelset[object_exists].numpy().astype(int)
+
         else:
             np_labels = labelset[labelset[:, -1] > 0].numpy().astype(int)
-
-        np_labels[:, -1] -= 1
 
         np_image = image.permute(1, 2, 0).numpy().copy().astype(np.uint8)
 
         for label in np_labels:
-            np_image = visualize_bbox(
-                np_image, label, color_list, classes
-            )
+            np_image = visualize_bbox(np_image, label, color_list, classes)
 
         bbs_applied_images.append(np_image)
 
@@ -122,8 +116,8 @@ def visualize_batch(images, labels, classes, targets=None) -> None:
 
     cv2.imwrite(str(file_name.absolute()), batch_image)
 
-def visualize_a_batch(config, val):
 
+def visualize_a_batch(config, val):
     with open(config) as file:
         config = yaml.safe_load(file)
 
@@ -154,7 +148,6 @@ def visualize_a_batch(config, val):
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--config", action="store", required=True)
@@ -162,6 +155,3 @@ if __name__ == "__main__":
     arguments = parser.parse_args()
 
     visualize_a_batch(arguments.config, arguments.val)
-
-    
-

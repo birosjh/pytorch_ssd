@@ -12,18 +12,17 @@ class Transformations:
 
     def __init__(self, config: dict, mode: str) -> None:
         transforms = []
-        
+
         if config["transform"] and mode == "train":
             transforms.append(A.HorizontalFlip(p=0.5))
             transforms.append(A.RandomBrightnessContrast(p=0.5))
-
 
         if config["normalize"]:
             transforms.append(
                 A.Normalize(
                     mean=[0.485, 0.456, 0.406],
                     std=[0.229, 0.224, 0.225],
-                    always_apply=True
+                    always_apply=True,
                 )
             )
 

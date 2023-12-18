@@ -65,7 +65,7 @@ class SSD(nn.Module):
             )
             conf.append(
                 self.conf_layers[idx](feature_map).permute(0, 2, 3, 1).contiguous()
-            )        
+            )
 
         loc = torch.cat([o.view(o.size(0), -1) for o in loc], 1)
         conf = torch.cat([o.view(o.size(0), -1) for o in conf], 1)
@@ -77,7 +77,6 @@ class SSD(nn.Module):
         return (conf, loc)
 
     def class_predictor(self, out_channels, num_anchors, num_classes):
-
         conf_head = nn.Conv2d(
             out_channels, num_anchors * num_classes, kernel_size=3, padding=1
         )
@@ -89,7 +88,6 @@ class SSD(nn.Module):
         return conf_head
 
     def bbox_predictor(self, out_channels, num_anchors):
-
         loc_head = nn.Conv2d(out_channels, num_anchors * 4, kernel_size=3, padding=1)
 
         nn.init.xavier_uniform_(loc_head.weight.data)
@@ -97,19 +95,25 @@ class SSD(nn.Module):
             nn.init.constant_(loc_head.bias, 0.0)
 
         return loc_head
-    
-    def convert_to_box(self, loc):
 
+    def convert_to_box(self, loc):
         default_boxes = self.data_encoder.default_boxes.to(self.device)
 
         new_locs = torch.zeros(loc.shape).to(self.device)
 
         for idx in range(loc.shape[0]):
-
-            new_locs[idx][:, 0] = loc[idx][:, 0] * (default_boxes[:, 2] - default_boxes[:, 0])
-            new_locs[idx][:, 1] = loc[idx][:, 1] * (default_boxes[:, 3] - default_boxes[:, 1])
-            new_locs[idx][:, 2] = loc[idx][:, 2] * (default_boxes[:, 2] - default_boxes[:, 0])
-            new_locs[idx][:, 3] = loc[idx][:, 3] * (default_boxes[:, 3] - default_boxes[:, 1])
+            new_locs[idx][:, 0] = loc[idx][:, 0] * (
+                default_boxes[:, 2] - default_boxes[:, 0]
+            )
+            new_locs[idx][:, 1] = loc[idx][:, 1] * (
+                default_boxes[:, 3] - default_boxes[:, 1]
+            )
+            new_locs[idx][:, 2] = loc[idx][:, 2] * (
+                default_boxes[:, 2] - default_boxes[:, 0]
+            )
+            new_locs[idx][:, 3] = loc[idx][:, 3] * (
+                default_boxes[:, 3] - default_boxes[:, 1]
+            )
 
             new_locs[idx][:, 0] += default_boxes[:, 0]
             new_locs[idx][:, 1] += default_boxes[:, 1]

@@ -13,7 +13,6 @@ import torch
 from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
 from torchmetrics.detection import MeanAveragePrecision
-from torchvision.ops import nms
 
 from src.loggers.log_handler import LogHandler
 from src.models.loss.ssd import SSDLoss
@@ -27,17 +26,22 @@ class Trainer:
     """
 
     def __init__(
-        self, model, train_dataset, val_dataset, training_config, device,
+        self,
+        model,
+        train_dataset,
+        val_dataset,
+        training_config,
+        device,
     ) -> None:
         self.model = model.to(device)
 
         print(self.model)
-        
+
         self.train_dataloader = DataLoader(
             train_dataset,
             batch_size=training_config["batch_size"],
             num_workers=training_config["num_workers"],
-            shuffle=True
+            shuffle=True,
         )
 
         self.val_dataloader = DataLoader(
@@ -47,16 +51,14 @@ class Trainer:
         )
 
         self.optimizer = torch.optim.SGD(
-            model.parameters(),
-            lr=training_config["learning_rate"],
-            momentum=0.9
+            model.parameters(), lr=training_config["learning_rate"], momentum=0.9
         )
 
         self.loss = SSDLoss(
             training_config["alpha"],
             training_config["iou_threshold"],
             device,
-            train_dataset.data_encoder
+            train_dataset.data_encoder,
         )
 
         self.batch_size = training_config["batch_size"]
@@ -68,7 +70,7 @@ class Trainer:
 
         self.classes = train_dataset.classes
         self.label_indices = np.arange(1, len(self.classes) + 1)
-        
+
         self.device = device
 
         self.map_frequency = training_config["map_frequency"]
@@ -138,7 +140,7 @@ class Trainer:
             images.cpu().detach(),
             predictions.cpu().detach(),
             self.classes,
-            targets.cpu().detach()
+            targets.cpu().detach(),
         )
 
         return {
@@ -183,8 +185,7 @@ class Trainer:
                     for indices, values, loc, target in zip(
                         max_indices, max_values, localizations, targets
                     ):
-                        
-                        object_indices = (target[:, -1].type(torch.int32) > 0)
+                        object_indices = target[:, -1].type(torch.int32) > 0
 
                         preds.append(
                             dict(
