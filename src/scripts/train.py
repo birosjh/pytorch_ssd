@@ -1,10 +1,13 @@
 import torch
 import yaml
 
-from src.datasets.image_dataset import ImageDataset
-from src.models.ssd import SSD
-from src.trainer.trainer import Trainer
+from src.models.lightning_model import LightningSSD
 from src.utils.data_encoder import DataEncoder
+from src.datamodules.pascal_datamodule import PascalDataModule
+
+from lightning.pytorch.loggers import CSVLogger, WandbLogger
+from lightning.pytorch.callbacks import LearningRateMonitor
+import lightning as L
 
 
 def train_model(config_path: str) -> None:
@@ -32,19 +35,20 @@ def train_model(config_path: str) -> None:
     training_config = config["training_configuration"]
     data_config = config["data_configuration"]
 
-    data_encoder = DataEncoder(model_config)
-
-    train_dataset = ImageDataset(
-        data_config=data_config, data_encoder=data_encoder, mode="train"
-    )
-
-    val_dataset = ImageDataset(
-        data_config=data_config, data_encoder=data_encoder, mode="val"
-    )
-
     num_classes = len(data_config["classes"]) + 1
 
-    model = SSD(model_config, num_classes, data_encoder, device)
+    data_encoder = DataEncoder(model_config)
 
-    trainer = Trainer(model, train_dataset, val_dataset, training_config, device)
-    trainer.train()
+    datamodule = PascalDataModule(data_config, training_config, data_encoder)
+
+    model = LightningSSD(model_config, training_config, data_encoder, num_classes)
+
+    trainer = L.Trainer(
+        max_epochs=30,
+        accelerator="auto",
+        devices=1 if device != "cpu" else None,
+        logger=[CSVLogger(save_dir="logs/"), WandbLogger(project="SSD")],
+        callbacks=[LearningRateMonitor(logging_interval="epoch")],
+    )
+
+    trainer.fit(model, datamodule)

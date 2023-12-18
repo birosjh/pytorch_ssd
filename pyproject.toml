@@ -22,6 +22,7 @@ torchmetrics = "^1.2.0"
 pycocotools = "^2.0.7"
 timm = "^0.9.12"
 ipython = "^8.18.1"
+lightning = "^2.1.2"
 
 
 [tool.poetry.group.dev.dependencies]
