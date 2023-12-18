@@ -22,22 +22,32 @@ https://hub.docker.com/r/pytorch/pytorch
 1. Build the container
 
 ```bash
-docker build . -t ssd
+docker compose build
 ```
 
 2. Start the container
 
-a. Locally
 ```bash
-docker run -itd --name ssd -v $(pwd):/app ssd
+docker compose up -d
 ```
 
-b. On Server
-```bash
-docker run -p 6006:6006 --gpus all -itd --name ssd -v .:/app ssd
-```
 
 3. SSH into the container
 ```bash
-docker exec -it ssd bash
+docker compose exec app bash
+```
+
+4. Shutdown the container
+```bash
+docker compose down
+```
+
+### Running the Project
+
+All commands for the model need to be performed inside of the container.
+Before training, make sure to set parameters in the config file (configs/config.yaml).
+
+1. Train the model
+```bash
+poetry run invoke train
 ```
