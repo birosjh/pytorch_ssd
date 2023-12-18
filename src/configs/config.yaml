@@ -20,7 +20,7 @@ training_configuration:
     num_workers: 4
     model_save_path: "saved_models"
     iou_threshold: 0.5
-    map_frequency: 10 # How often to run map calculation
+    map_frequency: 500 # How often to run map calculation
 
 data_configuration:
     train: "./data/train_sample.txt"

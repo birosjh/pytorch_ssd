@@ -5,7 +5,7 @@ from src.models.lightning_model import LightningSSD
 from src.utils.data_encoder import DataEncoder
 from src.datamodules.pascal_datamodule import PascalDataModule
 
-from lightning.pytorch.loggers import CSVLogger
+from lightning.pytorch.loggers import CSVLogger, WandbLogger
 from lightning.pytorch.callbacks import LearningRateMonitor
 import lightning as L
 
@@ -56,9 +56,9 @@ def train_model(config_path: str) -> None:
         max_epochs=30,
         accelerator="auto",
         devices=1 if device != "cpu" else None,
-        logger=CSVLogger(save_dir="logs/"),
+        logger=[CSVLogger(save_dir="logs/"), WandbLogger(project="SSD")],
         callbacks=[
-            LearningRateMonitor(logging_interval="step")
+            LearningRateMonitor(logging_interval="epoch")
         ],
     )
 
