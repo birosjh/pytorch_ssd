@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 
-from torchvision.ops import box_iou, generalized_box_iou_loss
-from src.models.loss.localization import LocalizationLoss
+from torchvision.ops import generalized_box_iou_loss
+# from src.models.loss.localization import LocalizationLoss
 
 
 class SSDLoss(nn.Module):

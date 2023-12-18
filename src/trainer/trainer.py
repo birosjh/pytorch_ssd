@@ -13,7 +13,6 @@ import torch
 from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
 from torchmetrics.detection import MeanAveragePrecision
-from torchvision.ops import nms
 
 from src.loggers.log_handler import LogHandler
 from src.models.loss.ssd import SSDLoss

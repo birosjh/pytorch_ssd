@@ -6,7 +6,6 @@ import matplotlib.cm as cm
 import numpy as np
 import yaml
 from torch.utils.data import DataLoader
-from torchvision.ops import box_iou
 
 from src.datasets.image_dataset import ImageDataset
 from src.utils.data_encoder import DataEncoder
@@ -92,9 +91,6 @@ def visualize_batch(images, labels, classes, targets=None) -> None:
 
     cmap = cm.viridis
     color_list = cmap(range(len(classes)))
-
-    target_cmap = cm.spring
-    target_color_list = target_cmap(range(len(classes)))
 
     for idx, (image, labelset) in enumerate(zip(images, labels)):
         if targets is not None:
