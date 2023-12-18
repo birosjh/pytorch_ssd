@@ -71,16 +71,13 @@ class ImageDataset(Dataset):
         label_tensor = torch.Tensor(labels)
 
         # Zero is for background
-        label_tensor[:,-1] += 1
+        label_tensor[:, -1] += 1
 
-        label_tensor = self.data_encoder.encode(
-            label_tensor,
-            self.iou_threshold
-        )
+        label_tensor = self.data_encoder.encode(label_tensor, self.iou_threshold)
 
         if self.visualize:
             return (image, label_tensor)
-        
+
         image = image.permute(2, 0, 1)
 
         return (image, label_tensor)

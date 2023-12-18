@@ -21,6 +21,7 @@ def visualize_a_batch(c, filename="src/configs/config.yaml", use_val=False):
 
     visualize_a_batch(filename, use_val)
 
+
 @task
 def visualize_default_box(c, filename="src/configs/config.yaml"):
     from src.visualize.visualize_default_box import visualize_default_box

@@ -45,7 +45,9 @@ class TestDataloader(unittest.TestCase):
         )
 
     def test_the_shape_a_the_batch(self):
-        dataloader = DataLoader(self.val_dataset, batch_size=self.batch_size, num_workers=0)
+        dataloader = DataLoader(
+            self.val_dataset, batch_size=self.batch_size, num_workers=0
+        )
 
         images, labels = next(iter(dataloader))
 
@@ -70,13 +72,13 @@ class TestDataloader(unittest.TestCase):
                 ]
             ),
         )
-    
-    def test_output(self):
 
-        dataloader = DataLoader(self.train_dataset, batch_size=self.batch_size, num_workers=0)
+    def test_output(self):
+        dataloader = DataLoader(
+            self.train_dataset, batch_size=self.batch_size, num_workers=0
+        )
 
         images, labels = next(iter(dataloader))
-
 
 
 if __name__ == "__main__":

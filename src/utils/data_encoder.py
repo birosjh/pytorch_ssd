@@ -13,6 +13,7 @@ import torch
 
 from torchvision.ops import box_iou
 
+
 class DataEncoder:
     def __init__(self, default_box_config):
         self.default_boxes = self.create_default_boxes(default_box_config)
@@ -69,7 +70,6 @@ class DataEncoder:
         return dboxes_ltrb
 
     def encode(self, ground_truth, criteria) -> torch.Tensor:
-
         bounding_boxes = ground_truth[:, 0:4]
         labels_in = ground_truth[:, -1]
 
@@ -103,18 +103,18 @@ class DataEncoder:
 
         # encoded_boxes = self.normalize(encoded_boxes)
 
-        encoded_ground_truth = torch.cat([encoded_boxes, labels_out.unsqueeze(dim=1)], dim=1)
+        encoded_ground_truth = torch.cat(
+            [encoded_boxes, labels_out.unsqueeze(dim=1)], dim=1
+        )
 
         return encoded_ground_truth
-    
-    def normalize(self, boxes, device=None):
 
+    def normalize(self, boxes, device=None):
         normalized_boxes = boxes.clone()
 
         default_boxes = self.default_boxes.clone()
 
         if device is not None:
-        
             default_boxes = default_boxes.to(device)
 
         normalized_boxes[:, 0] -= default_boxes[:, 0]
@@ -128,15 +128,13 @@ class DataEncoder:
         normalized_boxes[:, 3] /= default_boxes[:, 3] - default_boxes[:, 1]
 
         return normalized_boxes
-    
-    def denormalize(self, boxes, device=None):
 
+    def denormalize(self, boxes, device=None):
         denormalized_boxes = boxes.clone()
 
         default_boxes = self.default_boxes.clone()
 
         if device is not None:
-        
             default_boxes = default_boxes.to(device)
 
         denormalized_boxes[:, 0] *= default_boxes[:, 2] - default_boxes[:, 0]

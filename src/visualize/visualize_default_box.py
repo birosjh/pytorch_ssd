@@ -69,7 +69,6 @@ def visualize_default_box(config_file):
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--config", action="store", required=True)
