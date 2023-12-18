@@ -40,11 +40,15 @@ class LightningSSD(L.LightningModule):
 
         loss, breakdown = self.loss(confidences, localizations, targets)
 
-        return {
+        records = {
             "loss": loss,
             "confidence_loss": breakdown["conf"],
             "localization_loss": breakdown["loc"]
         }
+
+        self.log_dict(records)
+
+        return records
     
 
     def evaluate(self, batch, batch_idx, stage=None):
@@ -70,6 +74,8 @@ class LightningSSD(L.LightningModule):
             records["map_large"] = metrics["map_large"]
             records["map_medium"] = metrics["map_medium"]
             records["map_small"] = metrics["map_small"]
+
+        self.log_dict(records)
 
         return records
 
