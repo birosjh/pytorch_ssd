@@ -11,7 +11,6 @@ import torch.nn as nn
 
 from src.models.backbone.backbone_loader import backbone_loader
 from src.utils.data_encoder import DataEncoder
-from src.utils.default_box import number_of_default_boxes_per_cell
 
 
 class SSD(nn.Module):
@@ -32,9 +31,7 @@ class SSD(nn.Module):
         self.loc_layers = nn.ModuleList([])
         self.conf_layers = nn.ModuleList([])
 
-        num_defaults_per_cell = number_of_default_boxes_per_cell(
-            config["aspect_ratios"]
-        )
+        num_defaults_per_cell = self.data_encoder.number_of_default_boxes_per_cell()
 
         output_channels = self.feature_map_extractor.output_channels()
 

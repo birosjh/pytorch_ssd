@@ -13,16 +13,16 @@ class LightningSSD(L.LightningModule):
         self.model = SSD(model_config, num_classes, data_encoder)
 
         self.loss = SSDLoss(
-            training_config["alpha"],
-            training_config["iou_threshold"],
+            model_config["alpha"],
+            model_config["iou_threshold"],
             data_encoder,
         )
 
         self.map_frequency = training_config["map_frequency"]
 
         self.lr = training_config["learning_rate"]
-        self.momentum = training_config["momentum"]
-        self.weight_decay = training_config["weight_decay"]
+        self.momentum = model_config["momentum"]
+        self.weight_decay = model_config["weight_decay"]
 
         self.map = MeanAveragePrecision()
 
