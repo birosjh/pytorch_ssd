@@ -1,0 +1,6 @@
+backbone: "vgg16"
+pretrained: True
+momentum: 0.9
+weight_decay: 0.0005
+alpha: 0.9
+iou_threshold: 0.5

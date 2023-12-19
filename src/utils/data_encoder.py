@@ -18,6 +18,8 @@ class DataEncoder:
     def __init__(self, default_box_config):
         self.default_boxes = self.create_default_boxes(default_box_config)
 
+        self.aspect_ratios = default_box_config["aspect_ratios"]
+
     def create_default_boxes(self, default_box_config: dict) -> torch.Tensor:
         figure_size = default_box_config["figure_size"]
         feature_map_sizes = default_box_config["feature_map_sizes"]
@@ -148,3 +150,12 @@ class DataEncoder:
         denormalized_boxes[:, 3] += default_boxes[:, 3]
 
         return boxes
+
+    def number_of_default_boxes_per_cell(self) -> list:
+        num_defaults_per_cell = []
+
+        for aspect_ratio in self.aspect_ratios:
+            num_defaults = 2 + len(aspect_ratio) * 2
+            num_defaults_per_cell.append(num_defaults)
+
+        return num_defaults_per_cell

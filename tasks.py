@@ -1,11 +1,15 @@
 from invoke import task
+from hydra import compose, initialize
 
 
 @task
-def train(c, filename="src/configs/config.yaml"):
+def train(c):
     from src.scripts.train import train_model
 
-    train_model(filename)
+    with initialize(version_base=None, config_path="src/configs"):
+        config = compose(config_name="config")
+
+    train_model(config)
 
 
 @task

@@ -8,7 +8,6 @@ import torch
 import xmltodict
 from torch.utils.data import Dataset
 
-from src.datamodules.datasets.transformations import Transformations
 from src.utils.data_encoder import DataEncoder
 
 
@@ -20,13 +19,11 @@ class ImageDataset(Dataset):
     def __init__(
         self,
         data_config: dict,
+        transform,
         data_encoder: DataEncoder,
         mode: str = "train",
-        visualize: bool = False,
         iou_threshold: float = 0.5,
     ):
-        self.visualize = visualize
-
         # Read in necessary configs
         file_data_path = data_config[mode]
         self.image_directory = data_config["image_directory"]
@@ -35,10 +32,7 @@ class ImageDataset(Dataset):
 
         self.file_list = self.create_file_list(file_data_path)
 
-        self.transformations = Transformations(data_config["transformations"], mode)
-
-        self.height = data_config["transformations"]["figure_size"]
-        self.width = data_config["transformations"]["figure_size"]
+        self.transform = transform
 
         self.data_encoder = data_encoder
         self.default_boxes = self.data_encoder.default_boxes
@@ -59,7 +53,7 @@ class ImageDataset(Dataset):
         labels = self.load_labels_from_annotation(filename)
 
         # Perform transformations on the data
-        transformed_data = self.transformations(
+        transformed_data = self.transform(
             image=image,
             bounding_boxes=labels,
         )
@@ -74,9 +68,6 @@ class ImageDataset(Dataset):
         label_tensor[:, -1] += 1
 
         label_tensor = self.data_encoder.encode(label_tensor, self.iou_threshold)
-
-        if self.visualize:
-            return (image, label_tensor)
 
         image = image.permute(2, 0, 1)
 
