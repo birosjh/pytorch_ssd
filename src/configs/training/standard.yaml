@@ -1,0 +1,5 @@
+learning_rate: 0.0001
+batch_size: 32
+epochs: 40
+num_workers: 4
+map_frequency: 500 # How often to run map calculation

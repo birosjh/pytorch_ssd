@@ -1,0 +1,3 @@
+figure_size: 256 # Regardless of transform settings this will be applied
+transform: True
+normalize: True

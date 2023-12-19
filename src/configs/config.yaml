@@ -1,38 +1,7 @@
-model_configuration:
-    backbone: "vgg16"
-    pretrained: True
-    figure_size: 256
-    feature_map_sizes: [32, 16, 8, 6, 4, 1]
-    steps: [8, 16, 32, 64, 128, 256]
-    scales: [26, 51, 95, 138, 182, 225, 269]
-    aspect_ratios: [[2], [2,3], [2,3], [2,3], [2], [2]]
-
-training_configuration:
-    loggers: # Printing is on by default
-        tensorboard: True
-        textfile: True
-    learning_rate: 0.0001
-    momentum: 0.9
-    weight_decay: 0.0005
-    alpha: 0.9
-    batch_size: 32
-    epochs: 40
-    num_workers: 4
-    model_save_path: "saved_models"
-    iou_threshold: 0.5
-    map_frequency: 500 # How often to run map calculation
-
-data_configuration:
-    train: "./data/train_sample.txt"
-    val: "./data/val_sample.txt"
-    image_directory: "./data/JPEGImages"
-    annotation_directory: "./data/Annotations"
-    classes: ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus', 'car', 'cat', 'chair', 'cow', 'diningtable', 'dog', 'horse', 'motorbike', 'person', 'pottedplant', 'sheep', 'sofa', 'train', 'tvmonitor']
-
-    transformations:
-        figure_size: 256 # Regardless of transform settings this will be applied
-        transform: True
-        normalize: True
-
-inference_configuration:
-    model_path: "saved_models/best_model.pth"
+defaults:
+    - model: vgg16
+    - encoder: vgg16_encoder
+    - dataset: pascal
+    - transforms: standard
+    - training: standard
+    - inference: vgg16
