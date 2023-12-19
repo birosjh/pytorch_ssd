@@ -1,6 +1,5 @@
 from invoke import task
 from hydra import compose, initialize
-from omegaconf import OmegaConf
 
 
 @task

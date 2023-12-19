@@ -1,7 +1,5 @@
 import torch
-import yaml
-import hydra
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig
 
 from src.models.lightning_model import LightningSSD
 from src.utils.data_encoder import DataEncoder
@@ -12,7 +10,7 @@ from lightning.pytorch.callbacks import LearningRateMonitor
 import lightning as L
 
 
-def train_model(config : DictConfig) -> None:
+def train_model(config: DictConfig) -> None:
     """
     A function to train the SSD model
 
@@ -42,30 +40,17 @@ def train_model(config : DictConfig) -> None:
     data_encoder = DataEncoder(config["encoder"])
 
     datamodule = PascalDataModule(
-        data_config,
-        training_config,
-        transform_config,
-        data_encoder
+        data_config, training_config, transform_config, data_encoder
     )
 
-    model = LightningSSD(
-        model_config,
-        training_config,
-        data_encoder,
-        num_classes
-    )
+    model = LightningSSD(model_config, training_config, data_encoder, num_classes)
 
     trainer = L.Trainer(
         max_epochs=training_config["epochs"],
         accelerator="auto",
         devices=1 if device != "cpu" else None,
-        logger=[
-            CSVLogger(save_dir="logs/"),
-            WandbLogger(project="SSD")
-        ],
-        callbacks=[
-            LearningRateMonitor(logging_interval="epoch")
-        ],
+        logger=[CSVLogger(save_dir="logs/"), WandbLogger(project="SSD")],
+        callbacks=[LearningRateMonitor(logging_interval="epoch")],
     )
 
     trainer.fit(model, datamodule)

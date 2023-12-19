@@ -14,19 +14,23 @@ class PascalDataModule(L.LightningDataModule):
         self.transformation_config = transform_config
         self.data_encoder = data_encoder
 
-
     def setup(self, stage=None):
-
         train_transformations = Transformations(self.transformation_config, "train")
 
         self.train_dataset = ImageDataset(
-            data_config=self.data_config, transform=train_transformations, data_encoder=self.data_encoder, mode="train"
+            data_config=self.data_config,
+            transform=train_transformations,
+            data_encoder=self.data_encoder,
+            mode="train",
         )
 
         val_transformations = Transformations(self.transformation_config, "train")
 
         self.val_dataset = ImageDataset(
-            data_config=self.data_config, transform=val_transformations, data_encoder=self.data_encoder, mode="val"
+            data_config=self.data_config,
+            transform=val_transformations,
+            data_encoder=self.data_encoder,
+            mode="val",
         )
 
     def train_dataloader(self):

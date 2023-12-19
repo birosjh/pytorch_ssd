@@ -150,7 +150,7 @@ class DataEncoder:
         denormalized_boxes[:, 3] += default_boxes[:, 3]
 
         return boxes
-    
+
     def number_of_default_boxes_per_cell(self) -> list:
         num_defaults_per_cell = []
 

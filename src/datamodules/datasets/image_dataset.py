@@ -24,7 +24,6 @@ class ImageDataset(Dataset):
         mode: str = "train",
         iou_threshold: float = 0.5,
     ):
-
         # Read in necessary configs
         file_data_path = data_config[mode]
         self.image_directory = data_config["image_directory"]
