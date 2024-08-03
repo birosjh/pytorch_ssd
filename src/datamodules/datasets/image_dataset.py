@@ -62,16 +62,16 @@ class ImageDataset(Dataset):
         labels = transformed_data["bboxes"]
 
         image = torch.Tensor(image)
-        label_tensor = torch.Tensor(labels)
+        target_tensor = torch.Tensor(labels)
 
         # Zero is for background
-        label_tensor[:, -1] += 1
+        target_tensor[:, -1] += 1
 
-        label_tensor = self.data_encoder.encode(label_tensor, self.iou_threshold)
+        target_tensor = self.data_encoder.encode(target_tensor, self.iou_threshold)
 
         image = image.permute(2, 0, 1)
 
-        return (image, label_tensor)
+        return image, target_tensor
 
     def create_file_list(self, file_data_path: str) -> Any:
         """
