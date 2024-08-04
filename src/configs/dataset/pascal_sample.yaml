@@ -1,5 +1,5 @@
-train: "./data/train_sample.txt"
-val: "./data/val_sample.txt"
-image_directory: "./data/JPEGImages"
-annotation_directory: "./data/Annotations"
+train: "/data/train_sample.txt"
+val: "/data/val_sample.txt"
+image_directory: "/data/JPEGImages"
+annotation_directory: "/data/Annotations"
 classes: ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus', 'car', 'cat', 'chair', 'cow', 'diningtable', 'dog', 'horse', 'motorbike', 'person', 'pottedplant', 'sheep', 'sofa', 'train', 'tvmonitor']
