@@ -48,8 +48,8 @@ def train_model(config: DictConfig) -> None:
     trainer = L.Trainer(
         max_epochs=training_config["epochs"],
         accelerator="auto",
-        devices=1 if device != "cpu" else None,
-        logger=[CSVLogger(save_dir="logs/"), WandbLogger(project="SSD")],
+        devices=1,
+        logger=[CSVLogger(save_dir="logs/")],
         callbacks=[LearningRateMonitor(logging_interval="epoch")],
     )
 
