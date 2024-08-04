@@ -18,6 +18,9 @@ class DataEncoder:
     def __init__(self, default_box_config):
         self.default_boxes = self.create_default_boxes(default_box_config)
 
+        self.scale_xy = default_box_config.scale_xy
+        self.scale_wh = default_box_config.scale_wh
+
         self.aspect_ratios = default_box_config["aspect_ratios"]
 
     def create_default_boxes(self, default_box_config: dict) -> torch.Tensor:
