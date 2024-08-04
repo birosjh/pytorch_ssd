@@ -15,7 +15,9 @@ class LightningSSD(L.LightningModule):
         self.loss = SSDLoss(
             model_config["alpha"],
             model_config["iou_threshold"],
-            data_encoder,
+            data_encoder.default_boxes,
+            data_encoder.scale_xy,
+            data_encoder.scale_wh
         )
 
         self.map_frequency = training_config["map_frequency"]
@@ -34,15 +36,15 @@ class LightningSSD(L.LightningModule):
 
         confidences, localizations = self(images)
 
-        loss, breakdown = self.loss(confidences, localizations, targets)
+        loss, loc_loss, conf_loss = self.loss(confidences, localizations, targets)
 
         records = {
             "loss": loss,
-            "confidence_loss": breakdown["conf"],
-            "localization_loss": breakdown["loc"],
+            "confidence_loss": loc_loss,
+            "localization_loss": conf_loss,
         }
 
-        self.log_dict(records)
+        self.log_dict(records, on_step=False, on_epoch=True, prog_bar=True, logger=True)
 
         return records
 
@@ -51,12 +53,12 @@ class LightningSSD(L.LightningModule):
 
         confidences, localizations = self(images)
 
-        loss, breakdown = self.loss(confidences, localizations, targets)
+        loss, loc_loss, conf_loss = self.loss(confidences, localizations, targets)
 
         records = {
             "loss": loss,
-            "confidence_loss": breakdown["conf"],
-            "localization_loss": breakdown["loc"],
+            "confidence_loss": loc_loss,
+            "localization_loss": conf_loss,
         }
 
         if batch_idx % self.map_frequency == 0 and batch_idx > 0:
@@ -69,7 +71,7 @@ class LightningSSD(L.LightningModule):
             records["map_medium"] = metrics["map_medium"]
             records["map_small"] = metrics["map_small"]
 
-        self.log_dict(records)
+        self.log_dict(records, on_step=False, on_epoch=True, prog_bar=True, logger=True)
 
         return records
 
