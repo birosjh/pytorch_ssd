@@ -23,7 +23,6 @@ class LightningSSD(L.LightningModule):
         self.map_frequency = training_config["map_frequency"]
 
         self.lr = training_config["learning_rate"]
-        self.momentum = model_config["momentum"]
         self.weight_decay = model_config["weight_decay"]
 
         self.map = MeanAveragePrecision()
@@ -61,16 +60,6 @@ class LightningSSD(L.LightningModule):
             "localization_loss": conf_loss,
         }
 
-        if batch_idx % self.map_frequency == 0 and batch_idx > 0:
-            metrics = self.map.compute()
-
-            records["map"] = metrics["map"]
-            records["map_50"] = metrics["map_50"]
-            records["map_75"] = metrics["map_75"]
-            records["map_large"] = metrics["map_large"]
-            records["map_medium"] = metrics["map_medium"]
-            records["map_small"] = metrics["map_small"]
-
         self.log_dict(records, on_step=False, on_epoch=True, prog_bar=True, logger=True)
 
         return records
@@ -78,15 +67,30 @@ class LightningSSD(L.LightningModule):
     def validation_step(self, batch, batch_idx):
         self.evaluate(batch, batch_idx, "val")
 
+    def on_validation_epoch_end(self):
+
+        metrics = self.map.compute()
+
+        records = {
+            "map": metrics["map"],
+            "map_50": metrics["map_50"],
+            "map_75": metrics["map_75"],
+            "map_large": metrics["map_large"],
+            "map_medium": metrics["map_medium"],
+            "map_small": metrics["map_small"]
+        }
+
+        self.log_dict(records, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+
+
     def test_step(self, batch, batch_idx):
         self.evaluate(batch, batch_idx, "test")
 
     def configure_optimizers(self):
-        optimizer = torch.optim.SGD(
+        optimizer = torch.optim.AdamW(
             self.parameters(),
             lr=self.lr,
-            momentum=self.momentum,
-            weight_decay=self.weight_decay,
+            weight_decay=self.weight_decay
         )
 
         return {"optimizer": optimizer}
