@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 
+from functools import partial
 from torchvision.ops import generalized_box_iou_loss
 # from src.models.loss.localization import LocalizationLoss
 
@@ -10,7 +11,7 @@ class SSDLoss(nn.Module):
         super(SSDLoss, self).__init__()
 
         self.confidence_loss = nn.CrossEntropyLoss(reduction="none")
-        self.localization_loss = nn.SmoothL1Loss(reduction='none')
+        self.localization_loss = partial(generalized_box_iou_loss, reduction='none')
 
         self.alpha = alpha
         self.iou_threshold = iou_threshold
@@ -24,7 +25,10 @@ class SSDLoss(nn.Module):
         Create Location Offsets
         """
 
-        xy_offsets = self.scale_xy * (boxes[:, :, :2] - self.default_boxes[:, :, :2]) / self.default_boxes[:, :, 2:]
+        wh = self.default_boxes[:, :, 2:] - self.default_boxes[:, :, :2]
+
+
+        xy_offsets = self.scale_xy * (boxes[:, :, :2] - self.default_boxes[:, :, :2]) / wh
         wh_offsets = self.scale_wh * (boxes[:, :, 2:]/self.default_boxes[:, :, 2:]).log()
 
         return torch.cat((xy_offsets, wh_offsets), dim=2).contiguous()
@@ -50,9 +54,9 @@ class SSDLoss(nn.Module):
         non_zero_label_indices = labels > 0
         num_non_zero_targets = non_zero_label_indices.sum(dim=1)
         
-        location_offsets = self.create_offsets(boxes)
+        # location_offsets = self.create_offsets(boxes)
 
-        loc_loss = self.localization_loss(localizations, location_offsets).sum(dim=2)
+        loc_loss = self.localization_loss(localizations, boxes)
 
         # Retain only loss of non-background targets
         loc_loss = (non_zero_label_indices.float() * loc_loss).sum(dim=1)
@@ -83,4 +87,4 @@ class SSDLoss(nn.Module):
         num_non_zero_targets = num_non_zero_targets.float().clamp(min=1e-6)
         loss = (total_loss * num_mask / num_non_zero_targets).mean(dim=0)
 
-        return loss, loc_loss.detach().sum(), conf_loss.detach().sum()
+        return loss, loc_loss.detach().mean(), self.alpha * conf_loss.detach().mean()
