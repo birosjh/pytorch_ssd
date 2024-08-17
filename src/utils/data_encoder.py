@@ -67,7 +67,7 @@ class DataEncoder:
         dboxes_ltrb = dboxes.clone()
         dboxes_ltrb[:, 0] = dboxes[:, 0] - 0.5 * dboxes[:, 2]
         dboxes_ltrb[:, 1] = dboxes[:, 1] - 0.5 * dboxes[:, 3]
-        dboxes_ltrb[:, 2] = dboxes[:, 0] + 0.5 * dboxes[:, 2]
+        dboxes_ltrb[:, 2] = dboxes[:, 0] + 0.5 * dboxes[:, 2] 
         dboxes_ltrb[:, 3] = dboxes[:, 1] + 0.5 * dboxes[:, 3]
 
         dboxes_ltrb = dboxes_ltrb * figure_size
