@@ -1,4 +1,3 @@
-version: "3.9"
 services:
   app:
     build: .
@@ -8,6 +7,10 @@ services:
       - "8000:5000"
     volumes:
       - .:/app
+      - ../data:/data
+    env_file:
+    - path: .env
+      required: false # default
     deploy:
       resources:
         reservations:
@@ -15,3 +18,11 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
+
+  wandb:
+    image: wandb/local
+    tty: True
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./wandb:/vol  
