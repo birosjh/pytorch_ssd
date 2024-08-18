@@ -8,3 +8,4 @@ src/tests/test_data/*
 .vscode
 **/.DS_Store
 wandb
+.env
