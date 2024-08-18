@@ -1,5 +1,6 @@
 import torch
 from omegaconf import DictConfig
+from os import environ
 
 from src.models.lightning_model import LightningSSD
 from src.utils.data_encoder import DataEncoder
@@ -25,6 +26,7 @@ def train_model(config: DictConfig) -> None:
         device = "mps"
     elif torch.cuda.is_available():
         device = "cuda"
+        torch.set_float32_matmul_precision("high")
     else:
         device = "cpu"
 
@@ -45,11 +47,17 @@ def train_model(config: DictConfig) -> None:
 
     model = LightningSSD(model_config, training_config, data_encoder, num_classes)
 
+    loggers = [CSVLogger(save_dir="logs/")]
+
+    if environ.get("WANDB_API_KEY") is not None:
+        print("Using Wandb Logger")
+        loggers.append(WandbLogger(project="Pascal VOC"))
+
     trainer = L.Trainer(
         max_epochs=training_config["epochs"],
         accelerator="auto",
         devices=1,
-        logger=[CSVLogger(save_dir="logs/")],
+        logger=loggers,
         callbacks=[LearningRateMonitor(logging_interval="epoch")],
     )
 
