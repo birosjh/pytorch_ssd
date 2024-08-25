@@ -6,9 +6,9 @@ from torchvision.ops import generalized_box_iou_loss
 # from src.models.loss.localization import LocalizationLoss
 
 
-class SSDLoss(nn.Module):
+class MultiBoxLoss(nn.Module):
     def __init__(self, alpha, iou_threshold, default_boxes, scale_xy, scale_wh) -> None:
-        super(SSDLoss, self).__init__()
+        super(MultiBoxLoss, self).__init__()
 
         self.confidence_loss = nn.CrossEntropyLoss(reduction="none")
         self.localization_loss = partial(generalized_box_iou_loss, reduction='none')
